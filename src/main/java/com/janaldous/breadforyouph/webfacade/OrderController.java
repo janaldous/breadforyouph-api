@@ -39,7 +39,7 @@ public class OrderController {
 	}
 	
 	@PutMapping("/order/{id}")
-	public @ResponseBody ResponseEntity<OrderDetail> updateOrder(@PathVariable(value = "id") String idStr, OrderUpdateDto orderDto) {
+	public @ResponseBody ResponseEntity<OrderDetail> updateOrder(@PathVariable(value = "id") String idStr, @Valid @RequestBody OrderUpdateDto orderDto) {
 		Long id = Long.valueOf(idStr);
 		return new ResponseEntity<OrderDetail>(orderService.updateOrder(id, orderDto), HttpStatus.ACCEPTED);
 	}

@@ -126,12 +126,9 @@ class OrderServiceTest {
 	
 	@Test
 	void testUpdateExistingOrderThenSave() {
-		OrderDetail orderDetail = new OrderDetail();
-		OrderTracking tracking = new OrderTracking();
-		tracking.setStatus(OrderStatus.REGISTERED);
-		orderDetail.setTracking(tracking);
+		OrderDetail orderDetail = getOrderDetail();
 		Mockito.when(orderRepository.findById(Long.valueOf(1234l))).thenReturn(Optional.of(orderDetail));
-
+	
 		OrderUpdateDto orderDto = new OrderUpdateDto();
 		orderDto.setStatus(OrderStatus.COOKING);
 		
@@ -141,6 +138,14 @@ class OrderServiceTest {
 		Mockito.verify(orderRepository).save(argCaptor.capture());
 		
 		assertEquals(OrderStatus.COOKING, argCaptor.getValue().getTracking().getStatus());
+	}
+
+	private OrderDetail getOrderDetail() {
+		OrderDetail orderDetail = new OrderDetail();
+		OrderTracking tracking = new OrderTracking();
+		tracking.setStatus(OrderStatus.REGISTERED);
+		orderDetail.setTracking(tracking);
+		return orderDetail;
 	}
 
 	private OrderDetail mockOrder() {

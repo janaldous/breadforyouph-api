@@ -101,35 +101,46 @@ public class OrderControllerIT {
 	public void testValidOrder() throws Exception {
 
 		OrderDto orderMock = getMockOrder();
-		
+
 		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
 	}
-	
+
 	@Test
 	public void testGetAllOrders() throws Exception {
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/order")
-				.accept(MediaType.APPLICATION_JSON))
+		mockMvc.perform(MockMvcRequestBuilders.get("/order").accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 	}
-	
+
 	@Test
 	public void testUpdateNonExistingOrder() throws Exception {
-		
-		Mockito.when(orderService.updateOrder(Mockito.anyLong(), Mockito.any(OrderUpdateDto.class))).thenThrow(ResourceNotFoundException.class);
-		
+
+		Mockito.when(orderService.updateOrder(Mockito.anyLong(), Mockito.any(OrderUpdateDto.class)))
+				.thenThrow(ResourceNotFoundException.class);
+
 		OrderUpdateDto orderUpdate = new OrderUpdateDto();
 		orderUpdate.setStatus(OrderStatus.COOKING);
-		
-		mockMvc.perform(MockMvcRequestBuilders.put("/order/1234")
-				.content(mapper.writeValueAsString(orderUpdate))
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON))
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/order/1234").content(mapper.writeValueAsString(orderUpdate))
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 	}
 
+	@Test
+	public void testUpdateInvalidOrderThenThrowBadRequest() throws Exception {
+
+		OrderUpdateDto orderUpdate = new OrderUpdateDto();
+		orderUpdate.setStatus(null);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/order/1234").content(mapper.writeValueAsString(orderUpdate))
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.validation.status",
+						containsString("must not be null")))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
+	}
+	
 	private OrderDto getMockOrder() {
 		OrderDto orderMock = new OrderDto();
 		AddressDto address = new AddressDto();

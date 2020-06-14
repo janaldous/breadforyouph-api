@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -81,7 +83,7 @@ public class OrderService {
 		return orderRepository.findAllByStatus(status.get(), Sort.by("orderDate"));
 	}
 
-	public OrderDetail updateOrder(Long id, OrderUpdateDto orderDto) {
+	public OrderDetail updateOrder(Long id, @Valid OrderUpdateDto orderDto) {
 		Optional<OrderDetail> optOrder = orderRepository.findById(id);
 		if (!optOrder.isPresent()) throw new ResourceNotFoundException("Order with id: " + id + " was not found");
 		
