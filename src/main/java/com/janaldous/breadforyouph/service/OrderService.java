@@ -3,8 +3,11 @@ package com.janaldous.breadforyouph.service;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
@@ -68,6 +71,13 @@ public class OrderService {
 		OrderDetail savedOrder = orderRepository.save(orderDetail);
 		
 		return OrderConfirmationMapper.toDto(savedOrder);
+	}
+
+	public List<OrderDetail> getOrders(Optional<OrderStatus> status) {
+		if (!status.isPresent()) {
+			return orderRepository.findAll(Sort.by("orderDate"));
+		}
+		return orderRepository.findAllByStatus(status.get(), Sort.by("orderDate"));
 	}
 
 }

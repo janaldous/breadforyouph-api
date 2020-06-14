@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Sort;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.DeliveryType;
@@ -43,7 +45,7 @@ class OrderServiceTest {
 
 	@Mock
 	private AddressRepository addressRepository;
-	
+
 	@Mock
 	private OrderTrackingRepository orderTrackingRepository;
 
@@ -56,7 +58,7 @@ class OrderServiceTest {
 	}
 
 	@Test
-	void test() {
+	void testCreateOrder() {
 		OrderDto orderDto = new OrderDto();
 		AddressDto address = new AddressDto();
 		address.setLine1("Main Street");
@@ -72,15 +74,8 @@ class OrderServiceTest {
 		Mockito.when(mockBananaBread.getUnitPrice()).thenReturn(BigDecimal.valueOf(165));
 		Mockito.when(productRepository.findByName("Original Banana Bread")).thenReturn(mockBananaBread);
 
-		OrderDetail mockSavedOrder = new OrderDetail();
-		mockSavedOrder.setId(1234l);
-		User userEntity = new User();
-		userEntity.setContactNumber("01234");
-		mockSavedOrder.setUser(userEntity);
-		OrderTracking tracking = new OrderTracking();
-		tracking.setStatus(OrderStatus.REGISTERED);
-		mockSavedOrder.setTracking(tracking);
-		
+		OrderDetail mockSavedOrder = mockOrder();
+
 		Mockito.when(orderRepository.save(Mockito.any(OrderDetail.class))).thenReturn(mockSavedOrder);
 
 		OrderConfirmation result = orderService.order(orderDto);
@@ -98,9 +93,42 @@ class OrderServiceTest {
 		assertEquals(user.getContactNumber(), resultOrder.getUser().getContactNumber());
 		assertEquals(address.getLine1(), resultOrder.getShipping().getAddressLineOne());
 		assertEquals(new BigDecimal("165"), resultOrder.getTotal());
-		
+
 		assertEquals(OrderStatus.REGISTERED, result.getOrderStatus());
 		assertNotNull(result.getOrderNumber());
+	}
+	
+	@Test
+	public void testGetOrdersNoFilter() {
+		orderService.getOrders(Optional.empty());
+		
+		Mockito.verify(orderRepository).findAll(Mockito.any(Sort.class));
+	}
+	
+	@Test
+	public void testGetOrdersWithFilter() {
+		orderService.getOrders(Optional.of(OrderStatus.REGISTERED));
+		
+		Mockito.verify(orderRepository).findAllByStatus(Mockito.eq(OrderStatus.REGISTERED), Mockito.any(Sort.class));
+	}
+
+	private OrderDetail mockOrder() {
+		return mockOrder(1234l);
+	}
+
+	private OrderDetail mockOrder(Long id) {
+		OrderDetail mockSavedOrder = new OrderDetail();
+		mockSavedOrder.setId(1234l);
+		if (id != null) {
+			mockSavedOrder.setId(id);
+		}
+		User userEntity = new User();
+		userEntity.setContactNumber("01234");
+		mockSavedOrder.setUser(userEntity);
+		OrderTracking tracking = new OrderTracking();
+		tracking.setStatus(OrderStatus.REGISTERED);
+		mockSavedOrder.setTracking(tracking);
+		return mockSavedOrder;
 	}
 
 }

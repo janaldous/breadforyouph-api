@@ -103,6 +103,14 @@ public class OrderControllerIT {
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
 	}
+	
+	@Test
+	public void testGetAllOrders() throws Exception {
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/order")
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+	}
 
 	private OrderDto getMockOrder() {
 		OrderDto orderMock = new OrderDto();
