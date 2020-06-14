@@ -17,6 +17,7 @@ public class UserMapper {
 	}
 
 	public static UserDto toDto(User input) {
+		if (input == null) throw new IllegalArgumentException();
 		
 		UserDto output = new UserDto();
 		output.setContactNumber(input.getContactNumber());

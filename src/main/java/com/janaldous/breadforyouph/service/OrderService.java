@@ -11,11 +11,16 @@ import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderItem;
 import com.janaldous.breadforyouph.data.OrderRepository;
+import com.janaldous.breadforyouph.data.OrderStatus;
+import com.janaldous.breadforyouph.data.OrderTracking;
+import com.janaldous.breadforyouph.data.OrderTrackingRepository;
 import com.janaldous.breadforyouph.data.Product;
 import com.janaldous.breadforyouph.data.ProductRepository;
 import com.janaldous.breadforyouph.data.UserRepository;
+import com.janaldous.breadforyouph.domain.mapper.OrderConfirmationMapper;
 import com.janaldous.breadforyouph.domain.mapper.OrderItemMapper;
 import com.janaldous.breadforyouph.domain.mapper.OrderMapper;
+import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 
 @Service
@@ -33,7 +38,10 @@ public class OrderService {
 	@Autowired
 	private AddressRepository addressRepository;
 
-	public OrderDetail order(OrderDto orderDto) {
+	@Autowired
+	private OrderTrackingRepository orderTrackingRepository;
+
+	public OrderConfirmation order(OrderDto orderDto) {
 		OrderDetail orderDetail = OrderMapper.toEntity(orderDto);
 		orderDetail.setOrderDate(new Date());
 
@@ -46,11 +54,20 @@ public class OrderService {
 		OrderItem orderItem = OrderItemMapper.toEntity(orderDto.getQuantity(), originalBananaBread);
 		orderDetail.setOrderItems(Arrays.asList(orderItem));
 
+		// set sum
 		BigDecimal total = orderDetail.getOrderItems().stream().map(x -> x.getBuyingPrice()).reduce(BigDecimal.ZERO,
 				(subtotal, element) -> subtotal.add(element));
 		orderDetail.setTotal(total);
+		
+		// set tracking
+		OrderTracking tracking = new OrderTracking();
+		tracking.setStatus(OrderStatus.REGISTERED);
+		orderTrackingRepository.save(tracking);
+		orderDetail.setTracking(tracking);
 
-		return orderRepository.save(orderDetail);
+		OrderDetail savedOrder = orderRepository.save(orderDetail);
+		
+		return OrderConfirmationMapper.toDto(savedOrder);
 	}
 
 }

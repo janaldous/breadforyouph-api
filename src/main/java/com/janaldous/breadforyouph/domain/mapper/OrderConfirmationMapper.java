@@ -7,10 +7,12 @@ public class OrderConfirmationMapper {
 
 	public static OrderConfirmation toDto(OrderDetail input) {
 		if (input == null) throw new IllegalArgumentException();
+		if (input.getTracking() == null) throw new IllegalArgumentException("tracking must not be null");
 		
 		OrderConfirmation output = new OrderConfirmation();
 		output.setOrderNumber(input.getId());
 		output.setUser(UserMapper.toDto(input.getUser()));
+		output.setOrderStatus(input.getTracking().getStatus());
 		
 		return output;
 	}

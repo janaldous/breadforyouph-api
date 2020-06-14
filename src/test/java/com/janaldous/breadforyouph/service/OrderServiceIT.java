@@ -17,6 +17,7 @@ import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.OrderItemRepository;
 import com.janaldous.breadforyouph.data.OrderRepository;
+import com.janaldous.breadforyouph.data.OrderTrackingRepository;
 import com.janaldous.breadforyouph.data.PaymentType;
 import com.janaldous.breadforyouph.data.Product;
 import com.janaldous.breadforyouph.data.ProductRepository;
@@ -46,6 +47,9 @@ class OrderServiceIT {
 	@Autowired
 	private OrderItemRepository orderItemRepository;
 
+	@Autowired
+	private OrderTrackingRepository orderTrackingRepository;
+
 	@BeforeEach
 	public void beforeEach() {
 		Product product = new Product();
@@ -71,6 +75,7 @@ class OrderServiceIT {
 		assertEquals(1, addressRepository.count());
 		assertEquals(1, orderRepository.count());
 		assertEquals(1, orderItemRepository.count());
+		assertEquals(1, orderTrackingRepository.count());
 	}
 
 	private OrderDto getMockOrder() {

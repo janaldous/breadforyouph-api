@@ -98,7 +98,7 @@ public class OrderControllerIT {
 	public void testValidOrder() throws Exception {
 
 		OrderDto orderMock = getMockOrder();
-
+		
 		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();

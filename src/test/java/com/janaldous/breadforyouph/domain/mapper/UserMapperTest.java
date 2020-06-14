@@ -47,5 +47,12 @@ class UserMapperTest {
 		assertEquals(user.getEmail(), result.getEmail());
 		assertEquals(user.getLastName(), result.getLastName());
 	}
+	
+	@Test
+	void testToDtoNullObject() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			UserMapper.toDto(null);
+		});
+	}
 
 }

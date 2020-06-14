@@ -17,11 +17,16 @@ import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderRepository;
+import com.janaldous.breadforyouph.data.OrderStatus;
+import com.janaldous.breadforyouph.data.OrderTracking;
+import com.janaldous.breadforyouph.data.OrderTrackingRepository;
 import com.janaldous.breadforyouph.data.PaymentType;
 import com.janaldous.breadforyouph.data.Product;
 import com.janaldous.breadforyouph.data.ProductRepository;
+import com.janaldous.breadforyouph.data.User;
 import com.janaldous.breadforyouph.data.UserRepository;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
+import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 import com.janaldous.breadforyouph.webfacade.dto.UserDto;
 
@@ -38,6 +43,9 @@ class OrderServiceTest {
 
 	@Mock
 	private AddressRepository addressRepository;
+	
+	@Mock
+	private OrderTrackingRepository orderTrackingRepository;
 
 	@InjectMocks
 	private OrderService orderService;
@@ -64,7 +72,18 @@ class OrderServiceTest {
 		Mockito.when(mockBananaBread.getUnitPrice()).thenReturn(BigDecimal.valueOf(165));
 		Mockito.when(productRepository.findByName("Original Banana Bread")).thenReturn(mockBananaBread);
 
-		orderService.order(orderDto);
+		OrderDetail mockSavedOrder = new OrderDetail();
+		mockSavedOrder.setId(1234l);
+		User userEntity = new User();
+		userEntity.setContactNumber("01234");
+		mockSavedOrder.setUser(userEntity);
+		OrderTracking tracking = new OrderTracking();
+		tracking.setStatus(OrderStatus.REGISTERED);
+		mockSavedOrder.setTracking(tracking);
+		
+		Mockito.when(orderRepository.save(Mockito.any(OrderDetail.class))).thenReturn(mockSavedOrder);
+
+		OrderConfirmation result = orderService.order(orderDto);
 
 		ArgumentCaptor<OrderDetail> arg = ArgumentCaptor.forClass(OrderDetail.class);
 		Mockito.verify(orderRepository).save(arg.capture());
@@ -79,6 +98,9 @@ class OrderServiceTest {
 		assertEquals(user.getContactNumber(), resultOrder.getUser().getContactNumber());
 		assertEquals(address.getLine1(), resultOrder.getShipping().getAddressLineOne());
 		assertEquals(new BigDecimal("165"), resultOrder.getTotal());
+		
+		assertEquals(OrderStatus.REGISTERED, result.getOrderStatus());
+		assertNotNull(result.getOrderNumber());
 	}
 
 }

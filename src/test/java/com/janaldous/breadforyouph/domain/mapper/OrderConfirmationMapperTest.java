@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import com.janaldous.breadforyouph.data.OrderDetail;
+import com.janaldous.breadforyouph.data.OrderStatus;
+import com.janaldous.breadforyouph.data.OrderTracking;
 import com.janaldous.breadforyouph.data.User;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 
@@ -14,6 +16,17 @@ class OrderConfirmationMapperTest {
 
 	@Test
 	void test() {
+		OrderDetail input = getMockOrderDto();
+		
+		OrderConfirmation result = OrderConfirmationMapper.toDto(input);
+		
+		assertEquals(1234l, result.getOrderNumber());
+		assertNotNull(result.getUser());
+		assertEquals(input.getUser().getContactNumber(), result.getUser().getContactNumber());
+		assertEquals(OrderStatus.REGISTERED, result.getOrderStatus());
+	}
+	
+	private OrderDetail getMockOrderDto() {
 		OrderDetail input = new OrderDetail();
 		input.setId(1234l);
 		User user = new User();
@@ -22,21 +35,28 @@ class OrderConfirmationMapperTest {
 		user.setFirstName("example");
 		user.setLastName("doe");
 		user.setRole("customer");
-		
+		OrderTracking tracking = new OrderTracking();
+		tracking.setStatus(OrderStatus.REGISTERED);
+		input.setTracking(tracking);
 		input.setUser(user);
 		
-		OrderConfirmation result = OrderConfirmationMapper.toDto(input);
-		
-		assertEquals(null, result.getDeliveryStatus());
-		assertEquals(1234l, result.getOrderNumber());
-		assertNotNull(result.getUser());
-		assertEquals(user.getContactNumber(), result.getUser().getContactNumber());
+		return input;
 	}
-	
+
 	@Test
 	void testNullInput() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			OrderConfirmationMapper.toDto(null);
+		});
+	}
+	
+	@Test
+	void testNullOrderTracking() {
+		OrderDetail input = getMockOrderDto();
+		input.setTracking(null);
+		
+		assertThrows(IllegalArgumentException.class, () -> {
+			OrderConfirmationMapper.toDto(input);
 		});
 	}
 
