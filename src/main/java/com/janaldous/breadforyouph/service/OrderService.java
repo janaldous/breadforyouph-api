@@ -1,0 +1,56 @@
+package com.janaldous.breadforyouph.service;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.janaldous.breadforyouph.data.AddressRepository;
+import com.janaldous.breadforyouph.data.OrderDetail;
+import com.janaldous.breadforyouph.data.OrderItem;
+import com.janaldous.breadforyouph.data.OrderRepository;
+import com.janaldous.breadforyouph.data.Product;
+import com.janaldous.breadforyouph.data.ProductRepository;
+import com.janaldous.breadforyouph.data.UserRepository;
+import com.janaldous.breadforyouph.domain.mapper.OrderItemMapper;
+import com.janaldous.breadforyouph.domain.mapper.OrderMapper;
+import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
+
+@Service
+public class OrderService {
+
+	@Autowired
+	private OrderRepository orderRepository;
+
+	@Autowired
+	private ProductRepository productRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private AddressRepository addressRepository;
+
+	public OrderDetail order(OrderDto orderDto) {
+		OrderDetail orderDetail = OrderMapper.toEntity(orderDto);
+		orderDetail.setOrderDate(new Date());
+
+		// save transitive entities
+		userRepository.save(orderDetail.getUser());
+		addressRepository.save(orderDetail.getShipping());
+
+		// set product
+		Product originalBananaBread = productRepository.findByName("Original Banana Bread");
+		OrderItem orderItem = OrderItemMapper.toEntity(orderDto.getQuantity(), originalBananaBread);
+		orderDetail.setOrderItems(Arrays.asList(orderItem));
+
+		BigDecimal total = orderDetail.getOrderItems().stream().map(x -> x.getBuyingPrice()).reduce(BigDecimal.ZERO,
+				(subtotal, element) -> subtotal.add(element));
+		orderDetail.setTotal(total);
+
+		return orderRepository.save(orderDetail);
+	}
+
+}

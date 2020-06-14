@@ -1,0 +1,276 @@
+databaseChangeLog:
+- changeSet:
+    id: 1592112734763-1
+    author: janaldoustorres (generated)
+    changes:
+    - createSequence:
+        sequenceName: hibernate_sequence
+- changeSet:
+    id: 1592112734763-2
+    author: janaldoustorres (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: address_pkey
+            name: id
+            type: INTEGER
+        - column:
+            name: address_line_one
+            type: VARCHAR(255)
+        - column:
+            name: address_line_two
+            type: VARCHAR(255)
+        - column:
+            name: is_billing
+            type: BOOLEAN
+        - column:
+            name: city
+            type: VARCHAR(255)
+        - column:
+            name: country
+            type: VARCHAR(255)
+        - column:
+            name: postal_code
+            type: VARCHAR(255)
+        - column:
+            name: province
+            type: VARCHAR(255)
+        - column:
+            name: is_shipping
+            type: BOOLEAN
+        tableName: address
+- changeSet:
+    id: 1592112734763-3
+    author: janaldoustorres (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              primaryKey: true
+              primaryKeyName: books_pkey
+            name: id
+            type: SERIAL
+        - column:
+            name: title
+            type: TEXT
+        - column:
+            name: author
+            type: TEXT
+        tableName: books
+- changeSet:
+    id: 1592112734763-4
+    author: janaldoustorres (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: order_detail_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: order_date
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            name: order_total
+            type: numeric(19, 2)
+        - column:
+            name: billing_id
+            type: INTEGER
+        - column:
+            name: shipping_id
+            type: INTEGER
+        - column:
+            name: user_id
+            type: INTEGER
+        - column:
+            name: delivery_type
+            type: VARCHAR(255)
+        - column:
+            name: payment_type
+            type: VARCHAR(255)
+        tableName: order_detail
+- changeSet:
+    id: 1592112734763-5
+    author: janaldoustorres (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: order_item_pkey
+            name: id
+            type: INTEGER
+        - column:
+            name: buying_price
+            type: numeric(19, 2)
+        - column:
+            name: product_count
+            type: INTEGER
+        - column:
+            name: total
+            type: numeric(19, 2)
+        - column:
+            name: order_id
+            type: BIGINT
+        - column:
+            name: product_id
+            type: INTEGER
+        tableName: order_item
+- changeSet:
+    id: 1592112734763-6
+    author: janaldoustorres (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: product_pkey
+            name: id
+            type: INTEGER
+        - column:
+            name: code
+            type: VARCHAR(255)
+        - column:
+            name: description
+            type: VARCHAR(255)
+        - column:
+            name: name
+            type: VARCHAR(255)
+        - column:
+            name: unit_price
+            type: numeric(19, 2)
+        tableName: product
+- changeSet:
+    id: 1592112734763-7
+    author: janaldoustorres (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: user_detail_pkey
+            name: id
+            type: INTEGER
+        - column:
+            name: contact_number
+            type: VARCHAR(255)
+        - column:
+            name: email
+            type: VARCHAR(255)
+        - column:
+            name: first_name
+            type: VARCHAR(255)
+        - column:
+            name: last_name
+            type: VARCHAR(255)
+        - column:
+            name: role
+            type: VARCHAR(255)
+        tableName: user_detail
+- changeSet:
+    id: 1592112734763-8
+    author: janaldoustorres (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: product_id
+        baseTableName: order_item
+        constraintName: fk551losx9j75ss5d6bfsqvijna
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: product
+        validate: true
+- changeSet:
+    id: 1592112734763-9
+    author: janaldoustorres (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: billing_id
+        baseTableName: order_detail
+        constraintName: fk9efs7c9r198iw0am3lp9gr7pe
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: address
+        validate: true
+- changeSet:
+    id: 1592112734763-10
+    author: janaldoustorres (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: order_detail
+        constraintName: fki3ak21dvyd99avohifylcrtij
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: user_detail
+        validate: true
+- changeSet:
+    id: 1592112734763-11
+    author: janaldoustorres (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: shipping_id
+        baseTableName: order_detail
+        constraintName: fkj50er6n132twdby0r41dd9k52
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: address
+        validate: true
+- changeSet:
+    id: 1592112734763-12
+    author: janaldoustorres (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: order_id
+        baseTableName: order_item
+        constraintName: fktgnxy2ydiugl25vsye22npaxe
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: order_detail
+        validate: true
+- changeSet:
+    id: 1592112734763-13
+    author: janaldous
+    changes:
+    - insert:
+       tableName: product
+       columns:
+       - column:
+           name: id
+           value: 1
+       - column:
+           name: code
+           value: OBB
+       - column:
+           name: description
+           value: only product for now
+       - column:
+           name: name
+           value: Original Banana Bread
+       - column:
+           name: unit_price
+           value: 165
