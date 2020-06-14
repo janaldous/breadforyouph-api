@@ -3,6 +3,7 @@ package com.janaldous.breadforyouph.webfacade;
 import static org.hamcrest.Matchers.containsString;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.janaldous.breadforyouph.data.DeliveryType;
+import com.janaldous.breadforyouph.data.OrderStatus;
 import com.janaldous.breadforyouph.data.PaymentType;
 import com.janaldous.breadforyouph.service.OrderService;
+import com.janaldous.breadforyouph.service.ResourceNotFoundException;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 import com.janaldous.breadforyouph.webfacade.dto.UserDto;
@@ -110,6 +113,21 @@ public class OrderControllerIT {
 		mockMvc.perform(MockMvcRequestBuilders.get("/order")
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+	}
+	
+	@Test
+	public void testUpdateNonExistingOrder() throws Exception {
+		
+		Mockito.when(orderService.updateOrder(Mockito.anyLong(), Mockito.any(OrderUpdateDto.class))).thenThrow(ResourceNotFoundException.class);
+		
+		OrderUpdateDto orderUpdate = new OrderUpdateDto();
+		orderUpdate.setStatus(OrderStatus.COOKING);
+		
+		mockMvc.perform(MockMvcRequestBuilders.put("/order/1234")
+				.content(mapper.writeValueAsString(orderUpdate))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 	}
 
 	private OrderDto getMockOrder() {

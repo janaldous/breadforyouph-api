@@ -23,6 +23,7 @@ import com.janaldous.breadforyouph.data.UserRepository;
 import com.janaldous.breadforyouph.domain.mapper.OrderConfirmationMapper;
 import com.janaldous.breadforyouph.domain.mapper.OrderItemMapper;
 import com.janaldous.breadforyouph.domain.mapper.OrderMapper;
+import com.janaldous.breadforyouph.webfacade.OrderUpdateDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 
@@ -78,6 +79,16 @@ public class OrderService {
 			return orderRepository.findAll(Sort.by("orderDate"));
 		}
 		return orderRepository.findAllByStatus(status.get(), Sort.by("orderDate"));
+	}
+
+	public OrderDetail updateOrder(Long id, OrderUpdateDto orderDto) {
+		Optional<OrderDetail> optOrder = orderRepository.findById(id);
+		if (!optOrder.isPresent()) throw new ResourceNotFoundException("Order with id: " + id + " was not found");
+		
+		OrderDetail orderDetail = optOrder.get();
+		orderDetail.getTracking().setStatus(orderDto.getStatus());
+		
+		return orderRepository.save(orderDetail);
 	}
 
 }

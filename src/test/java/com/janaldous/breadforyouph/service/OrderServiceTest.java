@@ -2,6 +2,7 @@ package com.janaldous.breadforyouph.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import com.janaldous.breadforyouph.data.Product;
 import com.janaldous.breadforyouph.data.ProductRepository;
 import com.janaldous.breadforyouph.data.User;
 import com.janaldous.breadforyouph.data.UserRepository;
+import com.janaldous.breadforyouph.webfacade.OrderUpdateDto;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
@@ -110,6 +112,35 @@ class OrderServiceTest {
 		orderService.getOrders(Optional.of(OrderStatus.REGISTERED));
 		
 		Mockito.verify(orderRepository).findAllByStatus(Mockito.eq(OrderStatus.REGISTERED), Mockito.any(Sort.class));
+	}
+	
+	@Test
+	void testUpdateNonExistingOrdersThenThrowsException() {
+		Mockito.when(orderRepository.findById(Mockito.eq(Long.valueOf(1234l)))).thenReturn(Optional.empty());
+
+		OrderUpdateDto orderDto = new OrderUpdateDto();
+		assertThrows(ResourceNotFoundException.class, () -> {
+			orderService.updateOrder(Long.valueOf(1234l), orderDto);
+		});
+	}
+	
+	@Test
+	void testUpdateExistingOrderThenSave() {
+		OrderDetail orderDetail = new OrderDetail();
+		OrderTracking tracking = new OrderTracking();
+		tracking.setStatus(OrderStatus.REGISTERED);
+		orderDetail.setTracking(tracking);
+		Mockito.when(orderRepository.findById(Long.valueOf(1234l))).thenReturn(Optional.of(orderDetail));
+
+		OrderUpdateDto orderDto = new OrderUpdateDto();
+		orderDto.setStatus(OrderStatus.COOKING);
+		
+		orderService.updateOrder(Long.valueOf(1234l), orderDto);
+		
+		ArgumentCaptor<OrderDetail> argCaptor = ArgumentCaptor.forClass(OrderDetail.class);
+		Mockito.verify(orderRepository).save(argCaptor.capture());
+		
+		assertEquals(OrderStatus.COOKING, argCaptor.getValue().getTracking().getStatus());
 	}
 
 	private OrderDetail mockOrder() {

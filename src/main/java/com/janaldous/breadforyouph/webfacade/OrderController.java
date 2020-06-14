@@ -10,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -34,6 +36,12 @@ public class OrderController {
 	@GetMapping("/order")
 	public @ResponseBody List<OrderDetail> getOrders(Optional<OrderStatus> status) {
 		return orderService.getOrders(status);
+	}
+	
+	@PutMapping("/order/{id}")
+	public @ResponseBody ResponseEntity<OrderDetail> updateOrder(@PathVariable(value = "id") String idStr, OrderUpdateDto orderDto) {
+		Long id = Long.valueOf(idStr);
+		return new ResponseEntity<OrderDetail>(orderService.updateOrder(id, orderDto), HttpStatus.ACCEPTED);
 	}
 
 }

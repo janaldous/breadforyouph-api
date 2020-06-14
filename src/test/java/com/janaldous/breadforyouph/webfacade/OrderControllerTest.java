@@ -1,5 +1,7 @@
 package com.janaldous.breadforyouph.webfacade;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -22,10 +24,24 @@ class OrderControllerTest {
 		MockitoAnnotations.initMocks(this);
 	}
 	
-	@Test()
-	void testValidation() {
+	@Test
+	void testOrderValidation() {
 		OrderDto order = new OrderDto();
 		orderController.order(order);
+	}
+	
+	@Test
+	void testUpdateOrderValidId() {
+		OrderUpdateDto orderDto = new OrderUpdateDto();
+		orderController.updateOrder("1200", orderDto);
+	}
+	
+	@Test
+	void testUpdateOrderNonNumberId() {
+		OrderUpdateDto orderDto = new OrderUpdateDto();
+		assertThrows(NumberFormatException.class, () -> {
+			orderController.updateOrder("adbbd", orderDto);
+		});
 	}
 
 }
