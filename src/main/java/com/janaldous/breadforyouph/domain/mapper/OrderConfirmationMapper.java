@@ -6,6 +6,7 @@ import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 public class OrderConfirmationMapper {
 
 	public static OrderConfirmation toDto(OrderDetail input) {
+		if (input == null) throw new IllegalArgumentException();
 		
 		OrderConfirmation output = new OrderConfirmation();
 		output.setOrderNumber(input.getId());

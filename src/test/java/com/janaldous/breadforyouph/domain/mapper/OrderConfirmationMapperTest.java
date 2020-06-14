@@ -2,6 +2,7 @@ package com.janaldous.breadforyouph.domain.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +31,13 @@ class OrderConfirmationMapperTest {
 		assertEquals(1234l, result.getOrderNumber());
 		assertNotNull(result.getUser());
 		assertEquals(user.getContactNumber(), result.getUser().getContactNumber());
+	}
+	
+	@Test
+	void testNullInput() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			OrderConfirmationMapper.toDto(null);
+		});
 	}
 
 }
