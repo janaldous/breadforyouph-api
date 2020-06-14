@@ -56,10 +56,10 @@ class OrderServiceIT {
 		if (productRepository.findByName("Original Banana Bread") == null) {
 			product.setUnitPrice(new BigDecimal("165"));
 			productRepository.save(product);
-
-			Product origBananaBread = productRepository.findByName("Original Banana Bread");
-			assertThat(origBananaBread, is(not(nullValue())));
 		}
+
+		Product origBananaBread = productRepository.findByName("Original Banana Bread");
+		assertThat(origBananaBread, is(not(nullValue())));
 	}
 
 	@Test
