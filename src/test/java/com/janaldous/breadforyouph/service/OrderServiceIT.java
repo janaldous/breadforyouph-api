@@ -32,6 +32,7 @@ import com.janaldous.breadforyouph.data.ProductRepository;
 import com.janaldous.breadforyouph.data.User;
 import com.janaldous.breadforyouph.data.UserRepository;
 import com.janaldous.breadforyouph.testutil.TestUtils;
+import com.janaldous.breadforyouph.webfacade.OrderUpdateDto;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
@@ -137,6 +138,15 @@ class OrderServiceIT {
 			assertEquals(OrderStatus.REGISTERED, orders.get(i).getTracking().getStatus());
 		}
 	}
+	
+	@Test
+	void testUpdateOrderThenThrowValidationException() {
+		OrderUpdateDto orderUpdate = new OrderUpdateDto();
+		orderUpdate.setStatus(null);
+		
+		orderService.updateOrder(Long.valueOf(1234l), orderUpdate);
+	}
+
 	
 	private static OrderDetail mockOrderDetail() {
 		OrderDetail mockSavedOrder = new OrderDetail();
