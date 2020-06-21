@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.janaldous.breadforyouph.service.RestService;
 
+import springfox.documentation.annotations.ApiIgnore;
+
+@ApiIgnore
 @Controller
 @RequestMapping(path = "/book")
 @ResponseBody
@@ -27,7 +30,7 @@ public class RestController {
 	}
 
 	@RequestMapping(value = "data", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity onResRequest(@RequestParam(value = "id") String id) {
+	public ResponseEntity<String> onResRequest(@RequestParam(value = "id") String id) {
 		Long Id = Long.parseLong(id);
 		return ResponseEntity.ok(restService.getBookStats(Id));
 	}

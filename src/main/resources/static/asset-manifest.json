@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/static/css/main.89e0751f.chunk.css",
+    "main.js": "/static/js/main.ba322348.chunk.js",
+    "main.js.map": "/static/js/main.ba322348.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.21a2be8b.js",
+    "runtime-main.js.map": "/static/js/runtime-main.21a2be8b.js.map",
+    "static/js/2.3d39a493.chunk.js": "/static/js/2.3d39a493.chunk.js",
+    "static/js/2.3d39a493.chunk.js.map": "/static/js/2.3d39a493.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.b57c3e13cdabca9cdd1633493b931c89.js": "/precache-manifest.b57c3e13cdabca9cdd1633493b931c89.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.89e0751f.chunk.css.map": "/static/css/main.89e0751f.chunk.css.map",
+    "static/js/2.3d39a493.chunk.js.LICENSE.txt": "/static/js/2.3d39a493.chunk.js.LICENSE.txt",
+    "static/media/Home.scss": "/static/media/Orchide.47cc35eb.otf",
+    "static/media/bananabread.jpg": "/static/media/bananabread.d8f36668.jpg",
+    "static/media/bananabread3.jpg": "/static/media/bananabread3.0bf3d2c7.jpg",
+    "static/media/lemon.jpg": "/static/media/lemon.1d848d0e.jpg",
+    "static/media/logo.jpg": "/static/media/logo.279adb4a.jpg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.21a2be8b.js",
+    "static/js/2.3d39a493.chunk.js",
+    "static/css/main.89e0751f.chunk.css",
+    "static/js/main.ba322348.chunk.js"
+  ]
+}
