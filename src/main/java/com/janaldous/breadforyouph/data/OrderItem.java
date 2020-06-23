@@ -17,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
-
 @Entity
 @Table(name = "order_item")
 @Data
@@ -27,24 +26,32 @@ public class OrderItem implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	public OrderItem() {
+		
+	}
 	
+	public OrderItem(OrderDetail orderDetail) {
+		this.orderDetail = orderDetail;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	
+
 	@OneToOne
 	private Product product;
-	
+
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "order_id")
+	@JoinColumn(name = "order_id", nullable = false, updatable = false)
 	private OrderDetail orderDetail;
 
-	@Column (name = "buying_price")
+	@Column(name = "buying_price")
 	private BigDecimal buyingPrice;
-	
-	@Column (name = "product_count")
+
+	@Column(name = "product_count")
 	private int productCount;
-	
+
 	private BigDecimal total;
 }

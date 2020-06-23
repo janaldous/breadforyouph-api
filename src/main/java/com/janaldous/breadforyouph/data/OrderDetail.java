@@ -1,7 +1,6 @@
 package com.janaldous.breadforyouph.data;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class OrderDetail {
 	private PaymentType paymentType;
 
 	@OneToMany(mappedBy = "orderDetail", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private List<OrderItem> orderItems = new ArrayList<>();
+	private List<OrderItem> orderItems;
 
 	@Column(name = "order_date")
 	private Date orderDate;

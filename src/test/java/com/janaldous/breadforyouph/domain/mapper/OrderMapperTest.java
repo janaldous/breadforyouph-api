@@ -34,7 +34,7 @@ class OrderMapperTest {
 		assertEquals(address.getLine1(), result.getShipping().getAddressLineOne());
 		assertEquals(orderDto.getDeliveryType(), result.getDeliveryType());
 		assertEquals(orderDto.getPaymentType(), result.getPaymentType());
-		assertEquals(0, result.getOrderItems().size());
+		assertEquals(null, result.getOrderItems());
 	}
 
 	@Test

@@ -57,7 +57,7 @@ public class OrderService {
 
 		// set product
 		Product originalBananaBread = productRepository.findByName("Original Banana Bread");
-		OrderItem orderItem = OrderItemMapper.toEntity(orderDto.getQuantity(), originalBananaBread);
+		OrderItem orderItem = OrderItemMapper.toEntity(orderDto.getQuantity(), originalBananaBread, orderDetail);
 		orderDetail.setOrderItems(Arrays.asList(orderItem));
 
 		// set sum
@@ -72,6 +72,8 @@ public class OrderService {
 		orderDetail.setTracking(tracking);
 
 		OrderDetail savedOrder = orderRepository.save(orderDetail);
+		
+		System.out.println(savedOrder.getOrderItems().get(0).getOrderDetail().getId());
 		
 		return OrderConfirmationMapper.toDto(savedOrder);
 	}
