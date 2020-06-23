@@ -42,7 +42,8 @@ public class OrderController {
 	}
 	
 	@GetMapping("/order/{id}")
-	public @ResponseBody OrderDetail getOrder(Long id) {
+	public @ResponseBody OrderDetail getOrder(@PathVariable(value = "id") String idStr) {
+		Long id = Long.valueOf(idStr);
 		return orderService.getOrder(id);
 	}
 

@@ -1,6 +1,7 @@
 package com.janaldous.breadforyouph.webfacade;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.janaldous.breadforyouph.data.DeliveryType;
+import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderStatus;
 import com.janaldous.breadforyouph.data.PaymentType;
 import com.janaldous.breadforyouph.service.OrderService;
@@ -136,11 +138,21 @@ public class OrderControllerIT {
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/order/1234").content(mapper.writeValueAsString(orderUpdate))
 				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.validation.status",
-						containsString("must not be null")))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.validation.status", containsString("must not be null")))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
 	}
-	
+
+	@Test
+	public void testGetOrder() throws Exception {
+		OrderDetail mockOrderDetail = new OrderDetail();
+		mockOrderDetail.setId(1234l);
+		Mockito.when(orderService.getOrder(Mockito.anyLong())).thenReturn(mockOrderDetail);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/order/1234").accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1234)))
+				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+	}
+
 	private OrderDto getMockOrder() {
 		OrderDto orderMock = new OrderDto();
 		AddressDto address = new AddressDto();
