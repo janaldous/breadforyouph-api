@@ -139,6 +139,29 @@ class OrderServiceTest {
 		
 		assertEquals(OrderStatus.COOKING, argCaptor.getValue().getTracking().getStatus());
 	}
+	
+	@Test
+	void testGetOrderNullId() {
+		assertThrows(IllegalArgumentException.class, () -> orderService.getOrder(null));
+	}
+	
+	@Test
+	void testGetNonExistingOrderThenThrowsException() {
+		Mockito.when(orderRepository.findById(Mockito.eq(Long.valueOf(1234l)))).thenReturn(Optional.empty());
+		
+		assertThrows(ResourceNotFoundException.class, () -> {
+			orderService.getOrder(1234l);
+		});
+	}
+	
+	@Test
+	void testGetExistingOrder() {
+		OrderDetail orderDetail = getOrderDetail();
+		Mockito.when(orderRepository.findById(Long.valueOf(1234l))).thenReturn(Optional.of(orderDetail));
+		
+		OrderDetail order = orderService.getOrder(1234l);
+		assertEquals(orderDetail, order);
+	}
 
 	private OrderDetail getOrderDetail() {
 		OrderDetail orderDetail = new OrderDetail();

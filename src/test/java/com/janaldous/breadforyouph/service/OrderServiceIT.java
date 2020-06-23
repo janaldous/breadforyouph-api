@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -144,10 +145,9 @@ class OrderServiceIT {
 		OrderUpdateDto orderUpdate = new OrderUpdateDto();
 		orderUpdate.setStatus(null);
 		
-		orderService.updateOrder(Long.valueOf(1234l), orderUpdate);
+		assertThrows(ResourceNotFoundException.class, () -> orderService.updateOrder(Long.valueOf(1234l), orderUpdate));
 	}
 
-	
 	private static OrderDetail mockOrderDetail() {
 		OrderDetail mockSavedOrder = new OrderDetail();
 		User userEntity = new User();

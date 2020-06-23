@@ -93,4 +93,13 @@ public class OrderService {
 		return orderRepository.save(orderDetail);
 	}
 
+	public OrderDetail getOrder(Long id) {
+		if (id == null) throw new IllegalArgumentException();
+		
+		Optional<OrderDetail> optOrder = orderRepository.findById(id);
+		if (!optOrder.isPresent()) throw new ResourceNotFoundException("Order with id: " + id + " was not found");
+		
+		return optOrder.get();
+	}
+
 }

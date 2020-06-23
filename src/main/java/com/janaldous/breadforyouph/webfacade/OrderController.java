@@ -40,6 +40,11 @@ public class OrderController {
 	public @ResponseBody List<OrderDetail> getOrders(Optional<OrderStatus> status) {
 		return orderService.getOrders(status);
 	}
+	
+	@GetMapping("/order/{id}")
+	public @ResponseBody OrderDetail getOrder(Long id) {
+		return orderService.getOrder(id);
+	}
 
 	@PutMapping("/order/{id}")
 	public @ResponseBody ResponseEntity<OrderDetail> updateOrder(@PathVariable(value = "id") String idStr,
