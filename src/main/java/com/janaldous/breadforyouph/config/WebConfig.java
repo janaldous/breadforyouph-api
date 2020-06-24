@@ -13,7 +13,7 @@ public class WebConfig {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedMethods("GET", "POST", "PUT").allowedOrigins("http://localhost:3000", "https://breadforyouph-dev.herokuapp.com", "https://breadforyouph-api.herokuapp.com/");
+				registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "OPTIONS").allowedOrigins("http://localhost:3000", "https://breadforyouph-dev.herokuapp.com", "https://breadforyouph-api.herokuapp.com/");
 			}
 		};
 	}
