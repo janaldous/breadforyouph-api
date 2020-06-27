@@ -42,6 +42,9 @@ public class Address implements Serializable {
 	@NotBlank(message = "Please enter Postal Code!")	
 	private String postalCode;
 	
+	@Column(name ="special_instructions")
+	private String specialInstructions;
+	
 	@Column(name="is_shipping")
 	private boolean shipping;
 	

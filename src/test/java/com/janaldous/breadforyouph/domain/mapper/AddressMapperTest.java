@@ -17,6 +17,7 @@ class AddressMapperTest {
 		input.setCity("Sta Rosa");
 		input.setProvince("Laguna");
 		input.setPostcode("4026");
+		input.setSpecialInstructions("wait for the gate to open");
 
 		Address result = AddressMapper.toEntity(input);
 
@@ -26,6 +27,7 @@ class AddressMapperTest {
 		assertEquals(input.getPostcode(), result.getPostalCode());
 		assertEquals(input.getProvince(), result.getProvince());
 		assertEquals("Philippines", result.getCountry());
+		assertEquals(input.getSpecialInstructions(), result.getSpecialInstructions());
 	}
 
 	@Test

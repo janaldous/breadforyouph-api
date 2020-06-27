@@ -16,6 +16,7 @@ public class AddressMapper {
 		output.setPostalCode(input.getPostcode());
 		output.setProvince(input.getProvince());
 		output.setCountry("Philippines");
+		output.setSpecialInstructions(input.getSpecialInstructions());
 		
 		return output; 
 	}

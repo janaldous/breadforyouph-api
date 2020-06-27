@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.OrderDetail;
+import com.janaldous.breadforyouph.data.OrderItem;
 import com.janaldous.breadforyouph.data.OrderRepository;
 import com.janaldous.breadforyouph.data.OrderStatus;
 import com.janaldous.breadforyouph.data.OrderTracking;
@@ -187,6 +190,13 @@ class OrderServiceTest {
 		OrderTracking tracking = new OrderTracking();
 		tracking.setStatus(OrderStatus.REGISTERED);
 		mockSavedOrder.setTracking(tracking);
+		OrderItem orderItem = new OrderItem(mockSavedOrder);
+		orderItem.setBuyingPrice(BigDecimal.valueOf(165l));
+		orderItem.setProductCount(1);
+		orderItem.setTotal(BigDecimal.valueOf(165l));
+		List<OrderItem> orderItems = new ArrayList<>();
+		orderItems.add(orderItem);
+		mockSavedOrder.setOrderItems(orderItems);
 		return mockSavedOrder;
 	}
 

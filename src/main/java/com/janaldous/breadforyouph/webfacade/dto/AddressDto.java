@@ -17,5 +17,6 @@ public class AddressDto {
 	private String province;
 	@NotNull
 	private String postcode;
+	private String specialInstructions;
 
 }

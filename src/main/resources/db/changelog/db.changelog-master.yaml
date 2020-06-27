@@ -329,3 +329,13 @@ databaseChangeLog:
        - column:
            name: unit_price
            value: 165
+- changeSet:
+    id: 1
+    author: janaldous
+    changes:
+        - addColumn:
+            tableName: address
+            columns:
+            - column:
+                name: special_instructions
+                type: VARCHAR(255)
