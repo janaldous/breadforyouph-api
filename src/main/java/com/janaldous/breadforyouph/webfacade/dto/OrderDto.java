@@ -9,6 +9,7 @@ import com.janaldous.breadforyouph.data.PaymentType;
 import lombok.Data;
 
 @Data
+@ValidAddressConstraint
 public class OrderDto {
 
 	@NotNull
@@ -23,7 +24,6 @@ public class OrderDto {
 	private DeliveryType deliveryType;
 
 	@NotNull
-	@Valid
 	private AddressDto address;
 	
 }
