@@ -339,3 +339,47 @@ databaseChangeLog:
             - column:
                 name: special_instructions
                 type: VARCHAR(255)
+- changeSet:
+    id: 2
+    author: janaldous
+    changes:
+        - addColumn:
+            tableName: order_detail
+            columns:
+            - column:
+                name: delivery_date
+                type: BIGINT
+- changeSet:
+    id: 3
+    author: janaldous
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: delivery_date_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: delivery_date
+            type: TIMESTAMP
+        - column:
+            name: limit
+            type: INTEGER
+        tableName: delivery_date
+- changeSet:
+    id: 4
+    author: janaldous
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: delivery_date
+        baseTableName: order_detail
+        constraintName: order_detail_delivery_date
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: delivery_date
+        validate: true
