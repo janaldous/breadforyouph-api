@@ -21,6 +21,7 @@ import com.janaldous.breadforyouph.data.OrderStatus;
 import com.janaldous.breadforyouph.service.OrderService;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
+import com.janaldous.breadforyouph.webfacade.dto.OrderUpdateDto;
 
 import io.swagger.annotations.Api;
 

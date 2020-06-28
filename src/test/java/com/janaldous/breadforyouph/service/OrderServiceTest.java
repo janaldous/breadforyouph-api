@@ -31,10 +31,10 @@ import com.janaldous.breadforyouph.data.Product;
 import com.janaldous.breadforyouph.data.ProductRepository;
 import com.janaldous.breadforyouph.data.User;
 import com.janaldous.breadforyouph.data.UserRepository;
-import com.janaldous.breadforyouph.webfacade.OrderUpdateDto;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
+import com.janaldous.breadforyouph.webfacade.dto.OrderUpdateDto;
 import com.janaldous.breadforyouph.webfacade.dto.UserDto;
 
 class OrderServiceTest {

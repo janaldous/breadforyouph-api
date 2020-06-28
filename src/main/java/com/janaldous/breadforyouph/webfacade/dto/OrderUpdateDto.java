@@ -1,4 +1,4 @@
-package com.janaldous.breadforyouph.webfacade;
+package com.janaldous.breadforyouph.webfacade.dto;
 
 import javax.validation.constraints.NotNull;
 

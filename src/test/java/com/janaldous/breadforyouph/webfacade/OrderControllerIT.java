@@ -26,6 +26,7 @@ import com.janaldous.breadforyouph.service.OrderService;
 import com.janaldous.breadforyouph.service.ResourceNotFoundException;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
+import com.janaldous.breadforyouph.webfacade.dto.OrderUpdateDto;
 import com.janaldous.breadforyouph.webfacade.dto.UserDto;
 
 @AutoConfigureMockMvc
