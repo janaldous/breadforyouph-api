@@ -20,6 +20,9 @@ public class DeliveryDate {
 	
 	private Date date;
 	
-	private int limit;
+	/**
+	 * Limit of orders on this date
+	 */
+	private int limit = 6;
 	
 }
