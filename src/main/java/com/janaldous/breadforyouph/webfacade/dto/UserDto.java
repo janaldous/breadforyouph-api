@@ -12,7 +12,7 @@ public class UserDto {
 	private String firstName;
 	@NotNull
 	private String lastName;
-	@NotNull
+	@MobileNumberConstraint
 	private String contactNumber;
 	@Email
 	private String email;

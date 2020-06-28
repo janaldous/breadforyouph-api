@@ -165,7 +165,7 @@ class OrderServiceTest {
 		OrderDetail order = orderService.getOrder(1234l);
 		assertEquals(orderDetail, order);
 	}
-
+	
 	private OrderDetail getOrderDetail() {
 		OrderDetail orderDetail = new OrderDetail();
 		OrderTracking tracking = new OrderTracking();

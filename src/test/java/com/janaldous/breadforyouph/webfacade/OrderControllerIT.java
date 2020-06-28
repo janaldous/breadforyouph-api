@@ -57,9 +57,9 @@ public class OrderControllerIT {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.validation.user", containsString("must not be null")))
 				.andReturn();
 	}
-
+	
 	@Test
-	public void testOrderInvalidUserContactNumber() throws Exception {
+	public void testOrderNullUserContactNumber() throws Exception {
 
 		OrderDto orderMock = getMockOrder();
 		orderMock.getUser().setContactNumber(null);
@@ -67,7 +67,21 @@ public class OrderControllerIT {
 		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andExpect(MockMvcResultMatchers
-						.jsonPath("$.validation['user.contactNumber']", containsString("must not be null")))
+						.jsonPath("$.validation['user.contactNumber']", containsString("Invalid mobile number")))
+				.andReturn();
+
+	}
+	
+	@Test
+	public void testOrderInvalidUserContactNumber() throws Exception {
+
+		OrderDto orderMock = getMockOrder();
+		orderMock.getUser().setContactNumber("011212121");
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
+				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andExpect(MockMvcResultMatchers
+						.jsonPath("$.validation['user.contactNumber']", containsString("Invalid mobile number")))
 				.andReturn();
 
 	}
@@ -166,7 +180,7 @@ public class OrderControllerIT {
 		UserDto user = new UserDto();
 		user.setFirstName("John");
 		user.setLastName("Doe");
-		user.setContactNumber("1234567890");
+		user.setContactNumber("09123456789");
 		orderMock.setUser(user);
 		orderMock.setPaymentType(PaymentType.CASH);
 		orderMock.setQuantity(1l);
