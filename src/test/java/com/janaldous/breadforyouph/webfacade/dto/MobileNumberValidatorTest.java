@@ -48,4 +48,14 @@ class MobileNumberValidatorTest {
 	    	ValidationTestUtils.validate(input);
 	    });
 	}
+	
+	@Test
+	void testNullMobileNumber() {
+		Person input = new Person();
+		input.contactNumber = null;
+
+		assertThrows(ConstraintViolationException.class, () -> {
+	    	ValidationTestUtils.validate(input);
+	    });
+	}
 }
