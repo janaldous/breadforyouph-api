@@ -68,7 +68,7 @@ public class OrderControllerIT {
 		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andExpect(MockMvcResultMatchers
-						.jsonPath("$.validation['user.contactNumber']", containsString("must not be null")))
+						.jsonPath("$.validation['user.contactNumber']", containsString("Invalid mobile number")))
 				.andReturn();
 
 	}

@@ -56,6 +56,7 @@ public class OrderDetail {
 	private Date orderDate;
 	
 	@ManyToOne
+	@JoinColumn(name = "delivery_date")
 	private DeliveryDate deliveryDate;
 	
 	@OneToOne

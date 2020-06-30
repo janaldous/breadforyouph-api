@@ -10,7 +10,7 @@ public class MobileNumberValidator implements ConstraintValidator<MobileNumberCo
 
 	@Override
 	public boolean isValid(String contactField, ConstraintValidatorContext cxt) {
-		return contactField != null && contactField.matches("09[0-9]{9}") && (contactField.length() == 11);
+		return contactField != null && contactField.matches("^09[0-9]{9}$") && (contactField.length() == 11);
 	}
 
 }

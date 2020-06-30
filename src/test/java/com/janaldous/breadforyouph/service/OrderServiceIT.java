@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
+import com.janaldous.breadforyouph.data.DeliveryDate;
+import com.janaldous.breadforyouph.data.DeliveryDateRepository;
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderItemRepository;
@@ -59,6 +62,9 @@ class OrderServiceIT {
 
 	@Autowired
 	private OrderItemRepository orderItemRepository;
+	
+	@Autowired
+	private DeliveryDateRepository deliveryDateRepository;
 
 	private static boolean isDBInitialized = false;
 
@@ -98,6 +104,7 @@ class OrderServiceIT {
 			
 			userRepository.save(mockOrder.getUser());
 			orderTrackingRepository.save(mockOrder.getTracking());
+			deliveryDateRepository.save(mockOrder.getDeliveryDate());
 			orderRepository.save(mockOrder);
 		}
 		assertEquals(10, orderRepository.count());
@@ -158,6 +165,9 @@ class OrderServiceIT {
 		OrderTracking tracking = new OrderTracking();
 		tracking.setStatus(OrderStatus.REGISTERED);
 		mockSavedOrder.setTracking(tracking);
+		DeliveryDate deliveryDate = new DeliveryDate();
+		deliveryDate.setDate(new Date(LocalDate.now().plusDays(1).toEpochDay()));
+		mockSavedOrder.setDeliveryDate(deliveryDate );
 		return mockSavedOrder;
 	}
 
