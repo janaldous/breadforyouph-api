@@ -13,6 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
+import com.janaldous.breadforyouph.data.DeliveryDate;
+import com.janaldous.breadforyouph.data.DeliveryDateRepository;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderItem;
 import com.janaldous.breadforyouph.data.OrderRepository;
@@ -46,6 +48,9 @@ public class OrderService {
 
 	@Autowired
 	private OrderTrackingRepository orderTrackingRepository;
+	
+	@Autowired
+	private DeliveryDateRepository deliveryDateRepository;
 
 	public OrderConfirmation order(OrderDto orderDto) {
 		OrderDetail orderDetail = OrderMapper.toEntity(orderDto);
@@ -59,6 +64,10 @@ public class OrderService {
 		Product originalBananaBread = productRepository.findByName("Original Banana Bread");
 		OrderItem orderItem = OrderItemMapper.toEntity(orderDto.getQuantity(), originalBananaBread, orderDetail);
 		orderDetail.setOrderItems(Arrays.asList(orderItem));
+		
+		// set delivery date
+		DeliveryDate deliveryDate = deliveryDateRepository.findByDate(orderDto.getDeliveryDate());
+		orderDetail.setDeliveryDate(deliveryDate);
 
 		// set sum
 		BigDecimal total = orderDetail.getOrderItems().stream().map(x -> x.getBuyingPrice()).reduce(BigDecimal.ZERO,
@@ -72,8 +81,6 @@ public class OrderService {
 		orderDetail.setTracking(tracking);
 
 		OrderDetail savedOrder = orderRepository.save(orderDetail);
-		
-		System.out.println(savedOrder.getOrderItems().get(0).getOrderDetail().getId());
 		
 		return OrderConfirmationMapper.toDto(savedOrder);
 	}

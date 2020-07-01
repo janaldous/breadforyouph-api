@@ -1,5 +1,7 @@
 package com.janaldous.breadforyouph.data;
 
+import java.util.Date;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +13,7 @@ public interface DeliveryDateRepository extends JpaRepository<DeliveryDate, Long
 
 	@Query("SELECT d from DeliveryDate d WHERE d.date >= CURRENT_DATE ORDER BY d.date")
 	Page<DeliveryDate> findDeliveryDates(Pageable pageable);
+
+	DeliveryDate findByDate(Date date);
 
 }

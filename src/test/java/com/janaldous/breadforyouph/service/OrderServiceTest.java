@@ -6,12 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,6 +21,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Sort;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
+import com.janaldous.breadforyouph.data.DeliveryDate;
+import com.janaldous.breadforyouph.data.DeliveryDateRepository;
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderItem;
@@ -53,6 +57,9 @@ class OrderServiceTest {
 
 	@Mock
 	private OrderTrackingRepository orderTrackingRepository;
+	
+	@Mock
+	private DeliveryDateRepository deliveryDateRepository;
 
 	@InjectMocks
 	private OrderService orderService;
@@ -71,6 +78,7 @@ class OrderServiceTest {
 		orderDto.setDeliveryType(DeliveryType.DELIVER);
 		orderDto.setPaymentType(PaymentType.CASH);
 		orderDto.setQuantity(1l);
+		orderDto.setDeliveryDate(new Date());
 		UserDto user = new UserDto();
 		user.setContactNumber("1234567890");
 		orderDto.setUser(user);
@@ -79,15 +87,24 @@ class OrderServiceTest {
 		Mockito.when(mockBananaBread.getUnitPrice()).thenReturn(BigDecimal.valueOf(165));
 		Mockito.when(productRepository.findByName("Original Banana Bread")).thenReturn(mockBananaBread);
 
+		DeliveryDate mockDeliveryDate = new DeliveryDate();
+		mockDeliveryDate.setDate(orderDto.getDeliveryDate());
+		mockDeliveryDate.setOrderLimit(6);
+		mockDeliveryDate.setId(111l);
+		Mockito.when(deliveryDateRepository.findByDate(ArgumentMatchers.any(Date.class))).thenReturn(mockDeliveryDate);
+
 		OrderDetail mockSavedOrder = mockOrder();
 
 		Mockito.when(orderRepository.save(Mockito.any(OrderDetail.class))).thenReturn(mockSavedOrder);
 
 		OrderConfirmation result = orderService.order(orderDto);
+		assertNotNull(result.getOrderNumber());
+
+		assertEquals(OrderStatus.REGISTERED, result.getOrderStatus());
 
 		ArgumentCaptor<OrderDetail> arg = ArgumentCaptor.forClass(OrderDetail.class);
 		Mockito.verify(orderRepository).save(arg.capture());
-
+		
 		OrderDetail resultOrder = arg.getValue();
 		assertEquals(DeliveryType.DELIVER, resultOrder.getDeliveryType());
 		assertEquals(PaymentType.CASH, resultOrder.getPaymentType());
@@ -98,9 +115,7 @@ class OrderServiceTest {
 		assertEquals(user.getContactNumber(), resultOrder.getUser().getContactNumber());
 		assertEquals(address.getLine1(), resultOrder.getShipping().getAddressLineOne());
 		assertEquals(new BigDecimal("165"), resultOrder.getTotal());
-
-		assertEquals(OrderStatus.REGISTERED, result.getOrderStatus());
-		assertNotNull(result.getOrderNumber());
+		assertEquals(mockDeliveryDate, resultOrder.getDeliveryDate());
 	}
 	
 	@Test
