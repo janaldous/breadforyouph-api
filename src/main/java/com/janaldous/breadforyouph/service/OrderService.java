@@ -55,23 +55,23 @@ public class OrderService {
 		OrderDetail orderDetail = OrderMapper.toEntity(orderDto);
 		orderDetail.setOrderDate(new Date());
 
-		// save transitive entities
-		userRepository.save(orderDetail.getUser());
-		addressRepository.save(orderDetail.getShipping());
+		// set delivery date
+		DeliveryDate deliveryDate = deliveryDateService.getDeliveryDate(orderDto.getDeliveryDate());
+		orderDetail.setDeliveryDate(deliveryDate);
 
 		// set product
 		Product originalBananaBread = productRepository.findByName("Original Banana Bread");
 		OrderItem orderItem = OrderItemMapper.toEntity(orderDto.getQuantity(), originalBananaBread, orderDetail);
 		orderDetail.setOrderItems(Arrays.asList(orderItem));
 		
-		// set delivery date
-		DeliveryDate deliveryDate = deliveryDateService.getDeliveryDate(orderDto.getDeliveryDate());
-		orderDetail.setDeliveryDate(deliveryDate);
-
 		// set sum
 		BigDecimal total = orderDetail.getOrderItems().stream().map(x -> x.getBuyingPrice()).reduce(BigDecimal.ZERO,
 				(subtotal, element) -> subtotal.add(element));
 		orderDetail.setTotal(total);
+
+		// save transitive entities
+		addressRepository.save(orderDetail.getShipping());
+		userRepository.save(orderDetail.getUser());
 		
 		// set tracking
 		OrderTracking tracking = new OrderTracking();

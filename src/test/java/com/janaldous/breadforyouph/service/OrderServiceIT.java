@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +38,6 @@ import com.janaldous.breadforyouph.data.User;
 import com.janaldous.breadforyouph.data.UserRepository;
 import com.janaldous.breadforyouph.testutil.TestUtils;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
-import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderUpdateDto;
 import com.janaldous.breadforyouph.webfacade.dto.UserDto;
@@ -108,11 +106,21 @@ class OrderServiceIT {
 		assertEquals(10, orderRepository.count());
 	}
 
+	private void dbCleanUp() {
+		orderRepository.deleteAll();
+		userRepository.deleteAll();
+		addressRepository.deleteAll();
+		orderItemRepository.deleteAll();
+		orderTrackingRepository.deleteAll();
+		deliveryDateRepository.deleteAll();
+		isDBInitialized = false;
+	}
+
 	@Test
 	void testCreateOrder() {
 		OrderDto input = getMockOrder();
 		input.setDeliveryDate(deliveryDateRepository.findAll(PageRequest.of(0, 1)).getContent().get(0).getDate());
-		OrderConfirmation order = orderService.order(input);
+		orderService.order(input);
 
 		assertEquals(11, orderRepository.count());
 		assertEquals(11, userRepository.count());
@@ -121,18 +129,19 @@ class OrderServiceIT {
 		assertEquals(11, orderTrackingRepository.count());
 		
 		// clean up
-		orderRepository.deleteById(order.getOrderNumber());
-		assertEquals(10, orderRepository.count());
+		dbCleanUp();
 	}
-	
+
 	@Test
 	void testCreateOrderInvalidDeliveryDate() {
 		OrderDto input = getMockOrder();
 		input.setDeliveryDate(new Date(LocalDate.now().plusDays(2).toEpochDay()));
 		
 		assertNull(deliveryDateRepository.findByDate(input.getDeliveryDate()));
-		
+
 		assertThrows(ResourceNotFoundException.class, () -> orderService.order(input));
+		assertEquals(10, userRepository.count());
+		assertEquals(0, addressRepository.count());
 	}
 	
 	@Test
