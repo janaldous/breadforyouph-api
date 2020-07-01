@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.DeliveryDate;
@@ -78,23 +80,20 @@ class OrderServiceIT {
 			isDBInitialized = true;
 		}
 		
-		Product product = new Product();
-		product.setCode("code");
-		product.setDescription("The only product we have");
-		product.setName("Original Banana Bread");
-
-		if (productRepository.findByName("Original Banana Bread") == null) {
-			product.setUnitPrice(new BigDecimal("165"));
-			productRepository.save(product);
-		}
-
 		Product origBananaBread = productRepository.findByName("Original Banana Bread");
 		assertThat(origBananaBread, is(not(nullValue())));
 	}
 	
 	private void initializeDB() {
+		// add available delivery date
+		DeliveryDate deliveryDate = new DeliveryDate();
+		deliveryDate.setDate(new Date(TestUtils.getTimeAsMilis(1)));
+		DeliveryDate savedDeliveryDate = deliveryDateRepository.save(deliveryDate);
+		
+		// add orders
 		for (int i = 0; i < 10; i++) {
 			OrderDetail mockOrder = mockOrderDetail();
+			mockOrder.setDeliveryDate(savedDeliveryDate);
 			if (i % 2 == 1) mockOrder.getTracking().setStatus(OrderStatus.DELIVERED);
 			else mockOrder.getTracking().setStatus(OrderStatus.REGISTERED);
 			
@@ -104,7 +103,6 @@ class OrderServiceIT {
 			
 			userRepository.save(mockOrder.getUser());
 			orderTrackingRepository.save(mockOrder.getTracking());
-			deliveryDateRepository.save(mockOrder.getDeliveryDate());
 			orderRepository.save(mockOrder);
 		}
 		assertEquals(10, orderRepository.count());
@@ -113,6 +111,7 @@ class OrderServiceIT {
 	@Test
 	void testCreateOrder() {
 		OrderDto input = getMockOrder();
+		input.setDeliveryDate(deliveryDateRepository.findAll(PageRequest.of(0, 1)).getContent().get(0).getDate());
 		OrderConfirmation order = orderService.order(input);
 
 		assertEquals(11, orderRepository.count());
@@ -124,6 +123,16 @@ class OrderServiceIT {
 		// clean up
 		orderRepository.deleteById(order.getOrderNumber());
 		assertEquals(10, orderRepository.count());
+	}
+	
+	@Test
+	void testCreateOrderInvalidDeliveryDate() {
+		OrderDto input = getMockOrder();
+		input.setDeliveryDate(new Date(LocalDate.now().plusDays(2).toEpochDay()));
+		
+		assertNull(deliveryDateRepository.findByDate(input.getDeliveryDate()));
+		
+		assertThrows(ResourceNotFoundException.class, () -> orderService.order(input));
 	}
 	
 	@Test
@@ -165,9 +174,6 @@ class OrderServiceIT {
 		OrderTracking tracking = new OrderTracking();
 		tracking.setStatus(OrderStatus.REGISTERED);
 		mockSavedOrder.setTracking(tracking);
-		DeliveryDate deliveryDate = new DeliveryDate();
-		deliveryDate.setDate(new Date(LocalDate.now().plusDays(1).toEpochDay()));
-		mockSavedOrder.setDeliveryDate(deliveryDate );
 		return mockSavedOrder;
 	}
 

@@ -22,7 +22,6 @@ import org.springframework.data.domain.Sort;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.DeliveryDate;
-import com.janaldous.breadforyouph.data.DeliveryDateRepository;
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderItem;
@@ -59,7 +58,7 @@ class OrderServiceTest {
 	private OrderTrackingRepository orderTrackingRepository;
 	
 	@Mock
-	private DeliveryDateRepository deliveryDateRepository;
+	private DeliveryDateService deliveryDateService;
 
 	@InjectMocks
 	private OrderService orderService;
@@ -91,7 +90,7 @@ class OrderServiceTest {
 		mockDeliveryDate.setDate(orderDto.getDeliveryDate());
 		mockDeliveryDate.setOrderLimit(6);
 		mockDeliveryDate.setId(111l);
-		Mockito.when(deliveryDateRepository.findByDate(ArgumentMatchers.any(Date.class))).thenReturn(mockDeliveryDate);
+		Mockito.when(deliveryDateService.getDeliveryDate(ArgumentMatchers.any(Date.class))).thenReturn(mockDeliveryDate);
 
 		OrderDetail mockSavedOrder = mockOrder();
 

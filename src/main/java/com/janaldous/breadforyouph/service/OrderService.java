@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.DeliveryDate;
-import com.janaldous.breadforyouph.data.DeliveryDateRepository;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderItem;
 import com.janaldous.breadforyouph.data.OrderRepository;
@@ -50,7 +49,7 @@ public class OrderService {
 	private OrderTrackingRepository orderTrackingRepository;
 	
 	@Autowired
-	private DeliveryDateRepository deliveryDateRepository;
+	private DeliveryDateService deliveryDateService;
 
 	public OrderConfirmation order(OrderDto orderDto) {
 		OrderDetail orderDetail = OrderMapper.toEntity(orderDto);
@@ -66,7 +65,7 @@ public class OrderService {
 		orderDetail.setOrderItems(Arrays.asList(orderItem));
 		
 		// set delivery date
-		DeliveryDate deliveryDate = deliveryDateRepository.findByDate(orderDto.getDeliveryDate());
+		DeliveryDate deliveryDate = deliveryDateService.getDeliveryDate(orderDto.getDeliveryDate());
 		orderDetail.setDeliveryDate(deliveryDate);
 
 		// set sum
