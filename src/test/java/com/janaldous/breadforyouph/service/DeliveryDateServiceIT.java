@@ -1,8 +1,10 @@
 package com.janaldous.breadforyouph.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -16,38 +18,47 @@ import org.springframework.data.domain.Page;
 
 import com.janaldous.breadforyouph.data.DeliveryDate;
 import com.janaldous.breadforyouph.data.DeliveryDateRepository;
+import com.janaldous.breadforyouph.data.OrderRepository;
 import com.janaldous.breadforyouph.testutil.TestUtils;
 import com.janaldous.breadforyouph.webfacade.dto.DeliveryDateDto;
+import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
+import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 
 @SpringBootTest
 class DeliveryDateServiceIT {
 
 	@Autowired
-	private DeliveryDateRepository repository;
+	private DeliveryDateRepository deliveryDateRepository;
 
 	@Autowired
-	private DeliveryDateService service;
+	private DeliveryDateService deliveryDateService;
+	
+	@Autowired
+	private OrderService orderService;
+	
+	@Autowired
+	private OrderRepository orderRepository;
 
 	@BeforeEach
 	public void beforeEach() {
-		assertEquals(0, repository.count());
+		assertEquals(0, deliveryDateRepository.count());
 	}
 
 	@AfterEach
 	public void afterEach() {
-		repository.deleteAll();
+		deliveryDateRepository.deleteAll();
 	}
 
 	@Test
 	void smokeTest() {
 		DeliveryDate date1 = new DeliveryDate();
 		date1.setDate(new Date(TestUtils.getTimeAsMilis(1)));
-		repository.save(date1);
+		deliveryDateRepository.save(date1);
 
-		assertEquals(1, repository.count());
-		assertEquals(6, repository.findAll().get(0).getOrderLimit());
+		assertEquals(1, deliveryDateRepository.count());
+		assertEquals(6, deliveryDateRepository.findAll().get(0).getOrderLimit());
 
-		Page<DeliveryDate> result = service.getDeliveryDates(0, 5);
+		Page<DeliveryDate> result = deliveryDateService.getDeliveryDates(0, 5);
 		assertEquals(1, result.getTotalElements());
 		assertEquals(1, result.getContent().size());
 	}
@@ -57,12 +68,12 @@ class DeliveryDateServiceIT {
 		for (int i = 0; i < 5; i++) {
 			DeliveryDate date = new DeliveryDate();
 			date.setDate(new Date(TestUtils.getTimeAsMilis(i)));
-			repository.save(date);
+			deliveryDateRepository.save(date);
 		}
 
-		assertEquals(5, repository.count());
+		assertEquals(5, deliveryDateRepository.count());
 
-		Page<DeliveryDate> result = service.getDeliveryDates(0, 5);
+		Page<DeliveryDate> result = deliveryDateService.getDeliveryDates(0, 5);
 		assertEquals(5, result.getContent().size());
 		assertEquals(1, result.getTotalPages());
 	}
@@ -71,13 +82,13 @@ class DeliveryDateServiceIT {
 	void testRepoMoreThanOnePageThenReturn2Pages() {
 		for (int i = 0; i < 8; i++) {
 			DeliveryDate date = new DeliveryDate();
-			date.setDate(new Date(TestUtils.getTimeAsMilis(i)));
-			repository.save(date);
+			date.setDate(TestUtils.convertLocalDateToDate(LocalDate.now().plusDays(i)));
+			deliveryDateRepository.save(date);
 		}
 
-		assertEquals(8, repository.count());
+		assertEquals(8, deliveryDateRepository.count());
 
-		Page<DeliveryDate> result = service.getDeliveryDates(0, 5);
+		Page<DeliveryDate> result = deliveryDateService.getDeliveryDates(0, 5);
 		assertEquals(5, result.getContent().size());
 		assertEquals(2, result.getTotalPages());
 	}
@@ -85,9 +96,9 @@ class DeliveryDateServiceIT {
 	@Test
 	void testSaveDeliveryDate() {
 		DeliveryDateDto input = new DeliveryDateDto();
-		input.setDate(new Date(LocalDate.now().plusDays(1).toEpochDay()));
+		input.setDate(TestUtils.convertLocalDateToDate(LocalDate.now().plusDays(1)));
 
-		DeliveryDate result = service.createDeliveryDate(input);
+		DeliveryDate result = deliveryDateService.createDeliveryDate(input);
 
 		assertNotNull(result);
 		assertNotNull(result.getId());
@@ -95,7 +106,39 @@ class DeliveryDateServiceIT {
 
 	@Test
 	void testGetNullDeliveryDateThenThrowResourceNotFoundException() {
-		assertThrows(ResourceNotFoundException.class, () -> service.getDeliveryDate(null));
+		assertThrows(ResourceNotFoundException.class, () -> deliveryDateService.getDeliveryDate(null));
+	}
+	
+	@Test
+	void testValidateDeliveryDateGivenDateWhenEnoughSpaceThenValidRequest() {
+		DeliveryDate deliveryDate = new DeliveryDate();
+		deliveryDate.setDate(TestUtils.convertLocalDateToDate(LocalDate.now()));
+		deliveryDate = deliveryDateRepository.save(deliveryDate);
+		
+		assertTrue(deliveryDateService.isDeliveryDateAvailable(TestUtils.convertLocalDateToDate(LocalDate.now())));
+		
+		// clean up
+		deliveryDateRepository.deleteById(deliveryDate.getId());
+	}
+	
+	@Test
+	void testValidateDeliveryDateGivenDateWhenNotEnoughSpaceThenInvalidRequest() {
+		// set up
+		DeliveryDate deliveryDate = new DeliveryDate();
+		deliveryDate.setDate(TestUtils.convertLocalDateToDate(LocalDate.now()));
+		deliveryDate.setOrderLimit(1);
+		deliveryDate = deliveryDateRepository.save(deliveryDate);
+		
+		OrderDto orderDtoMock = OrderDtoMockFactory.factory();
+		orderDtoMock.setDeliveryDate(deliveryDate.getDate());
+		OrderConfirmation orderConfirmation = orderService.order(orderDtoMock);
+		
+		// action
+		assertFalse(deliveryDateService.isDeliveryDateAvailable(orderConfirmation.getDeliveryDate()));
+		
+		// clean up
+		orderRepository.deleteAll();
+		deliveryDateRepository.deleteById(deliveryDate.getId());
 	}
 
 }

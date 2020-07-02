@@ -33,7 +33,11 @@ public class DeliveryDateService {
 	public DeliveryDate getDeliveryDate(@NotNull Date date) {
 		return Optional.ofNullable(deliveryDateRepository.findByDate(date))
 				.orElseThrow(() -> new ResourceNotFoundException("Cannot find delivery date with date = " + date));
-
+	}
+	
+	public boolean isDeliveryDateAvailable(@NotNull Date date) {
+		DeliveryDate deliveryDate = getDeliveryDate(date);
+		return deliveryDate.getOrders().size() < deliveryDate.getOrderLimit();
 	}
 
 }

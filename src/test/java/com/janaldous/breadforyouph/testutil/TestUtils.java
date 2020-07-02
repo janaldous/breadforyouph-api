@@ -1,5 +1,6 @@
 package com.janaldous.breadforyouph.testutil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -23,6 +24,10 @@ public class TestUtils {
 		ZonedDateTime zdt = ldt.atZone(ZoneId.of("Z"));
 		long millis = zdt.toInstant().toEpochMilli();
 		return millis;
+	}
+	
+	public static Date convertLocalDateToDate(LocalDate localDate) {
+		return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 	}
 
 }

@@ -70,6 +70,8 @@ class OrderServiceTest {
 
 	@Test
 	void testCreateOrder() {
+		assertEquals(0, orderRepository.count());
+		
 		OrderDto orderDto = new OrderDto();
 		AddressDto address = new AddressDto();
 		address.setLine1("Main Street");
@@ -91,7 +93,8 @@ class OrderServiceTest {
 		mockDeliveryDate.setOrderLimit(6);
 		mockDeliveryDate.setId(111l);
 		Mockito.when(deliveryDateService.getDeliveryDate(ArgumentMatchers.any(Date.class))).thenReturn(mockDeliveryDate);
-
+		Mockito.when(deliveryDateService.isDeliveryDateAvailable(ArgumentMatchers.any(Date.class))).thenReturn(true);
+		
 		OrderDetail mockSavedOrder = mockOrder();
 
 		Mockito.when(orderRepository.save(Mockito.any(OrderDetail.class))).thenReturn(mockSavedOrder);

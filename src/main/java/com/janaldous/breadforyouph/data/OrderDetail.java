@@ -56,7 +56,7 @@ public class OrderDetail {
 	private Date orderDate;
 	
 	@ManyToOne
-	@JoinColumn(name = "delivery_date")
+	@JoinColumn(name = "delivery_date", nullable = false, updatable = false)
 	private DeliveryDate deliveryDate;
 	
 	@OneToOne
