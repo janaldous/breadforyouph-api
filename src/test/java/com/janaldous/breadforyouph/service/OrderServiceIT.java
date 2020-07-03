@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.DeliveryDate;
@@ -38,6 +39,7 @@ import com.janaldous.breadforyouph.testutil.TestUtils;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderUpdateDto;
 
+@DirtiesContext
 @SpringBootTest
 class OrderServiceIT {
 

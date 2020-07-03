@@ -15,15 +15,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.test.annotation.DirtiesContext;
 
+import com.janaldous.breadforyouph.data.AddressRepository;
 import com.janaldous.breadforyouph.data.DeliveryDate;
 import com.janaldous.breadforyouph.data.DeliveryDateRepository;
+import com.janaldous.breadforyouph.data.OrderItemRepository;
 import com.janaldous.breadforyouph.data.OrderRepository;
+import com.janaldous.breadforyouph.data.UserRepository;
 import com.janaldous.breadforyouph.testutil.TestUtils;
 import com.janaldous.breadforyouph.webfacade.dto.DeliveryDateDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 
+@DirtiesContext
 @SpringBootTest
 class DeliveryDateServiceIT {
 
@@ -38,14 +43,28 @@ class DeliveryDateServiceIT {
 	
 	@Autowired
 	private OrderRepository orderRepository;
+	
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private AddressRepository addressRepository;
+	
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 
 	@BeforeEach
 	public void beforeEach() {
 		assertEquals(0, deliveryDateRepository.count());
+		assertEquals(0, orderRepository.count());
 	}
 
 	@AfterEach
 	public void afterEach() {
+		orderRepository.deleteAll();
+		userRepository.deleteAll();
+		addressRepository.deleteAll();
+		orderItemRepository.deleteAll();
 		deliveryDateRepository.deleteAll();
 	}
 
@@ -62,7 +81,7 @@ class DeliveryDateServiceIT {
 		assertEquals(1, result.getTotalElements());
 		assertEquals(1, result.getContent().size());
 	}
-
+	
 	@Test
 	void testOnePage() {
 		for (int i = 0; i < 5; i++) {
