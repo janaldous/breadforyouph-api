@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +34,7 @@ import com.janaldous.breadforyouph.data.Product;
 import com.janaldous.breadforyouph.data.ProductRepository;
 import com.janaldous.breadforyouph.data.User;
 import com.janaldous.breadforyouph.data.UserRepository;
+import com.janaldous.breadforyouph.testutil.TestUtils;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
@@ -79,7 +80,7 @@ class OrderServiceTest {
 		orderDto.setDeliveryType(DeliveryType.DELIVER);
 		orderDto.setPaymentType(PaymentType.CASH);
 		orderDto.setQuantity(1l);
-		orderDto.setDeliveryDate(new Date());
+		orderDto.setDeliveryDateId(1l);
 		UserDto user = new UserDto();
 		user.setContactNumber("1234567890");
 		orderDto.setUser(user);
@@ -89,11 +90,11 @@ class OrderServiceTest {
 		Mockito.when(productRepository.findByName("Original Banana Bread")).thenReturn(mockBananaBread);
 
 		DeliveryDate mockDeliveryDate = new DeliveryDate();
-		mockDeliveryDate.setDate(orderDto.getDeliveryDate());
+		mockDeliveryDate.setDate(TestUtils.convertLocalDateToDate(LocalDate.now()));
 		mockDeliveryDate.setOrderLimit(6);
 		mockDeliveryDate.setId(111l);
-		Mockito.when(deliveryDateService.getDeliveryDate(ArgumentMatchers.any(Date.class))).thenReturn(mockDeliveryDate);
-		Mockito.when(deliveryDateService.isDeliveryDateAvailable(ArgumentMatchers.any(Date.class))).thenReturn(true);
+		Mockito.when(deliveryDateService.getDeliveryDate(ArgumentMatchers.any(Long.class))).thenReturn(mockDeliveryDate);
+		Mockito.when(deliveryDateService.isDeliveryDateAvailable(ArgumentMatchers.any(Long.class))).thenReturn(true);
 		
 		OrderDetail mockSavedOrder = mockOrder();
 

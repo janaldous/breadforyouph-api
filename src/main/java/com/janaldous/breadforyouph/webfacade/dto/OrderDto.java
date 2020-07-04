@@ -1,7 +1,5 @@
 package com.janaldous.breadforyouph.webfacade.dto;
 
-import java.util.Date;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -28,7 +26,7 @@ public class OrderDto {
 	private DeliveryType deliveryType;
 	
 	@NotNull
-	private Date deliveryDate;
+	private Long deliveryDateId;
 
 	@NotNull
 	private AddressDto address;

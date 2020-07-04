@@ -55,10 +55,10 @@ public class OrderService {
 		OrderDetail orderDetail = OrderMapper.toEntity(orderDto);
 		orderDetail.setOrderDate(new Date());
 		
-		if (!deliveryDateService.isDeliveryDateAvailable(orderDto.getDeliveryDate())) throw new OrderException("Order limit exeeded");
+		if (!deliveryDateService.isDeliveryDateAvailable(orderDto.getDeliveryDateId())) throw new OrderException("Order limit exeeded");
 
 		// set delivery date
-		DeliveryDate deliveryDate = deliveryDateService.getDeliveryDate(orderDto.getDeliveryDate());
+		DeliveryDate deliveryDate = deliveryDateService.getDeliveryDate(orderDto.getDeliveryDateId());
 		orderDetail.setDeliveryDate(deliveryDate);
 
 		// set product

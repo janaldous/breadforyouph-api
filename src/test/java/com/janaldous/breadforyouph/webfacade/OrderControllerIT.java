@@ -3,8 +3,6 @@ package com.janaldous.breadforyouph.webfacade;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
-import java.util.Date;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -106,12 +104,12 @@ public class OrderControllerIT {
 	public void testOrderInvalidOrderDate() throws Exception {
 
 		OrderDto orderMock = getMockOrder();
-		orderMock.setDeliveryDate(null);
+		orderMock.setDeliveryDateId(null);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andExpect(MockMvcResultMatchers
-						.jsonPath("$.validation['deliveryDate']", containsString("must not be null")))
+						.jsonPath("$.validation['deliveryDateId']", containsString("must not be null")))
 				.andReturn();
 
 	}
@@ -134,6 +132,7 @@ public class OrderControllerIT {
 	public void testValidOrder() throws Exception {
 
 		OrderDto orderMock = getMockOrder();
+		orderMock.setDeliveryDateId(1l);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
@@ -194,7 +193,7 @@ public class OrderControllerIT {
 		address.setPostcode("4026");
 		orderMock.setAddress(address);
 		orderMock.setDeliveryType(DeliveryType.DELIVER);
-		orderMock.setDeliveryDate(new Date());
+		orderMock.setDeliveryDateId(null);
 		UserDto user = new UserDto();
 		user.setFirstName("John");
 		user.setLastName("Doe");

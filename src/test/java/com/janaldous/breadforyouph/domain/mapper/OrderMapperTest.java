@@ -3,8 +3,6 @@ package com.janaldous.breadforyouph.domain.mapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.Date;
-
 import org.junit.jupiter.api.Test;
 
 import com.janaldous.breadforyouph.data.DeliveryType;
@@ -30,7 +28,7 @@ class OrderMapperTest {
 		orderDto.setDeliveryType(DeliveryType.DELIVER);
 		orderDto.setPaymentType(PaymentType.CASH);
 		orderDto.setQuantity(1l);
-		orderDto.setDeliveryDate(new Date());
+		orderDto.setDeliveryDateId(0l);
 
 		OrderDetail result = OrderMapper.toEntity(orderDto);
 		assertEquals(user.getContactNumber(), result.getUser().getContactNumber());

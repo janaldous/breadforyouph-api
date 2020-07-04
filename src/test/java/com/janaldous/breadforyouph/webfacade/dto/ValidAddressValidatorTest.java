@@ -2,7 +2,6 @@ package com.janaldous.breadforyouph.webfacade.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Date;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -79,7 +78,7 @@ class ValidAddressValidatorTest {
 		address.setPostcode("4026");
 		orderMock.setAddress(address);
 		orderMock.setDeliveryType(DeliveryType.DELIVER);
-		orderMock.setDeliveryDate(new Date());
+		orderMock.setDeliveryDateId(1l);
 		UserDto user = new UserDto();
 		user.setFirstName("John");
 		user.setLastName("Doe");

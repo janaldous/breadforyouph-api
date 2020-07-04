@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -25,7 +26,6 @@ import com.janaldous.breadforyouph.data.OrderRepository;
 import com.janaldous.breadforyouph.data.UserRepository;
 import com.janaldous.breadforyouph.testutil.TestUtils;
 import com.janaldous.breadforyouph.webfacade.dto.DeliveryDateDto;
-import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 
 @DirtiesContext
@@ -124,8 +124,8 @@ class DeliveryDateServiceIT {
 	}
 
 	@Test
-	void testGetNullDeliveryDateThenThrowResourceNotFoundException() {
-		assertThrows(ResourceNotFoundException.class, () -> deliveryDateService.getDeliveryDate(null));
+	void testGetNullDeliveryDateThenThrowParameterValidationException() {
+		assertThrows(InvalidDataAccessApiUsageException.class, () -> deliveryDateService.getDeliveryDate(null));
 	}
 	
 	@Test
@@ -134,7 +134,7 @@ class DeliveryDateServiceIT {
 		deliveryDate.setDate(TestUtils.convertLocalDateToDate(LocalDate.now()));
 		deliveryDate = deliveryDateRepository.save(deliveryDate);
 		
-		assertTrue(deliveryDateService.isDeliveryDateAvailable(TestUtils.convertLocalDateToDate(LocalDate.now())));
+		assertTrue(deliveryDateService.isDeliveryDateAvailable(deliveryDate.getId()));
 		
 		// clean up
 		deliveryDateRepository.deleteById(deliveryDate.getId());
@@ -149,11 +149,11 @@ class DeliveryDateServiceIT {
 		deliveryDate = deliveryDateRepository.save(deliveryDate);
 		
 		OrderDto orderDtoMock = OrderDtoMockFactory.factory();
-		orderDtoMock.setDeliveryDate(deliveryDate.getDate());
-		OrderConfirmation orderConfirmation = orderService.order(orderDtoMock);
+		orderDtoMock.setDeliveryDateId(deliveryDate.getId());
+		orderService.order(orderDtoMock);
 		
 		// action
-		assertFalse(deliveryDateService.isDeliveryDateAvailable(orderConfirmation.getDeliveryDate()));
+		assertFalse(deliveryDateService.isDeliveryDateAvailable(deliveryDate.getId()));
 		
 		// clean up
 		orderRepository.deleteAll();

@@ -1,6 +1,5 @@
 package com.janaldous.breadforyouph.service;
 
-import java.util.Date;
 import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
@@ -30,13 +29,15 @@ public class DeliveryDateService {
 		return deliveryDateRepository.save(input);
 	}
 
-	public DeliveryDate getDeliveryDate(@NotNull Date date) {
-		return Optional.ofNullable(deliveryDateRepository.findByDate(date))
-				.orElseThrow(() -> new ResourceNotFoundException("Cannot find delivery date with date = " + date));
+	public DeliveryDate getDeliveryDate(@NotNull Long deliveryDateId) {
+		return deliveryDateRepository.findById(deliveryDateId).orElseThrow(
+				() -> new ResourceNotFoundException("Cannot find delivery date with id = " + deliveryDateId));
 	}
-	
-	public boolean isDeliveryDateAvailable(@NotNull Date date) {
-		DeliveryDate deliveryDate = getDeliveryDate(date);
+
+	public boolean isDeliveryDateAvailable(@NotNull Long deliveryDateId) {
+		Optional<DeliveryDate> optDeliveryDate = deliveryDateRepository.findById(deliveryDateId);
+		DeliveryDate deliveryDate = optDeliveryDate.orElseThrow(
+				() -> new ResourceNotFoundException("Cannot find delivery date with id = " + deliveryDateId));
 		return deliveryDate.getOrders().size() < deliveryDate.getOrderLimit();
 	}
 

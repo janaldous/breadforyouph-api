@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -125,7 +124,7 @@ class OrderServiceIT {
 		assertEquals(10, userRepository.count());
 		
 		OrderDto input = getMockOrder();
-		input.setDeliveryDate(deliveryDateRepository.findAll(PageRequest.of(0, 1)).getContent().get(0).getDate());
+		input.setDeliveryDateId(deliveryDateRepository.findAll(PageRequest.of(0, 1)).getContent().get(0).getId());
 		orderService.order(input);
 
 		assertEquals(11, orderRepository.count());
@@ -141,9 +140,7 @@ class OrderServiceIT {
 	@Test
 	void testCreateOrderInvalidDeliveryDate() {
 		OrderDto input = getMockOrder();
-		input.setDeliveryDate(TestUtils.convertLocalDateToDate(LocalDate.now().plusDays(2)));
-
-		assertNull(deliveryDateRepository.findByDate(input.getDeliveryDate()));
+		input.setDeliveryDateId(0l);
 
 		assertThrows(ResourceNotFoundException.class, () -> orderService.order(input));
 		assertEquals(10, userRepository.count());
@@ -158,7 +155,7 @@ class OrderServiceIT {
 		deliveryDate = deliveryDateRepository.save(deliveryDate);
 
 		OrderDto input = getMockOrder();
-		input.setDeliveryDate(TestUtils.convertLocalDateToDate(LocalDate.now().plusDays(2)));
+		input.setDeliveryDateId(deliveryDate.getId());
 
 		orderService.order(input);
 
