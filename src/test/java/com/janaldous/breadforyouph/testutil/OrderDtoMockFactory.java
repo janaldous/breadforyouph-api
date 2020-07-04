@@ -1,4 +1,4 @@
-package com.janaldous.breadforyouph.service;
+package com.janaldous.breadforyouph.testutil;
 
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.PaymentType;

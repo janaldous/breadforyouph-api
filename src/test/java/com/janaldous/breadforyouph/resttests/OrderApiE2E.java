@@ -20,7 +20,7 @@ import org.springframework.http.MediaType;
 import com.janaldous.breadforyouph.data.DeliveryDate;
 import com.janaldous.breadforyouph.data.DeliveryDateRepository;
 import com.janaldous.breadforyouph.data.OrderStatus;
-import com.janaldous.breadforyouph.service.OrderDtoMockFactory;
+import com.janaldous.breadforyouph.testutil.OrderDtoMockFactory;
 import com.janaldous.breadforyouph.testutil.TestUtils;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
