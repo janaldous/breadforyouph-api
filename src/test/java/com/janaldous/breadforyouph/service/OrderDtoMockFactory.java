@@ -25,7 +25,7 @@ public class OrderDtoMockFactory {
 		UserDto user = new UserDto();
 		user.setFirstName("John");
 		user.setLastName("Doe");
-		user.setContactNumber("1234567890");
+		user.setContactNumber("09123456789");
 		orderMock.setUser(user);
 		orderMock.setPaymentType(PaymentType.CASH);
 		orderMock.setQuantity(1l);

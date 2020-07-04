@@ -27,7 +27,7 @@ public class TestUtils {
 	}
 	
 	public static Date convertLocalDateToDate(LocalDate localDate) {
-		return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+		return Date.from(localDate.atStartOfDay().atZone(ZoneId.of("UTC")).toInstant());
 	}
 
 }
