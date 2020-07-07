@@ -1,6 +1,8 @@
-package com.janaldous.breadforyouph.webfacade;
+package com.janaldous.breadforyouph.webfacade.customer;
 
 import java.util.List;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,23 +11,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.janaldous.breadforyouph.data.DeliveryDate;
 import com.janaldous.breadforyouph.service.DeliveryDateService;
+import com.janaldous.breadforyouph.service.OrderService;
 import com.janaldous.breadforyouph.service.ResourceNotFoundException;
-import com.janaldous.breadforyouph.webfacade.dto.DeliveryDateDto;
+import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
+import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 
 import io.swagger.annotations.Api;
 
 @Api
 @RestController
-public class DeliveryController {
+@RequestMapping("/api")
+public class PublicController {
 
 	@Autowired
 	private DeliveryDateService deliveryService;
+	
+	@Autowired
+	private OrderService orderService;
 
 	@GetMapping("/delivery")
 	public @ResponseBody List<DeliveryDate> getDeliveryDates(@RequestParam("page") int page,
@@ -40,8 +49,8 @@ public class DeliveryController {
 		return resultPage.getContent();
 	}
 	
-	@PostMapping("/delivery")
-	public ResponseEntity<DeliveryDate> createDeliveryDate(@RequestBody DeliveryDateDto deliveryDate) {
-		return new ResponseEntity<DeliveryDate>(deliveryService.createDeliveryDate(deliveryDate), HttpStatus.CREATED);
+	@PostMapping("/order")
+	public @ResponseBody ResponseEntity<OrderConfirmation> order(@Valid @RequestBody OrderDto orderDto) {
+		return new ResponseEntity<OrderConfirmation>(orderService.order(orderDto), HttpStatus.CREATED);
 	}
 }

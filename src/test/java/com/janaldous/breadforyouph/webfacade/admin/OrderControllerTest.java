@@ -1,4 +1,4 @@
-package com.janaldous.breadforyouph.webfacade;
+package com.janaldous.breadforyouph.webfacade.admin;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.janaldous.breadforyouph.service.OrderService;
-import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderUpdateDto;
 
 class OrderControllerTest {
@@ -23,12 +22,6 @@ class OrderControllerTest {
 	@BeforeEach
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-	}
-
-	@Test
-	void testOrderValidation() {
-		OrderDto order = new OrderDto();
-		orderController.order(order);
 	}
 
 	@Test

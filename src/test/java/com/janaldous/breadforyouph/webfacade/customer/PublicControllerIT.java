@@ -1,16 +1,21 @@
-package com.janaldous.breadforyouph.webfacade;
+package com.janaldous.breadforyouph.webfacade.customer;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,41 +23,84 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.janaldous.breadforyouph.data.DeliveryDate;
 import com.janaldous.breadforyouph.data.DeliveryType;
-import com.janaldous.breadforyouph.data.OrderDetail;
-import com.janaldous.breadforyouph.data.OrderStatus;
 import com.janaldous.breadforyouph.data.PaymentType;
+import com.janaldous.breadforyouph.service.DeliveryDateService;
 import com.janaldous.breadforyouph.service.OrderService;
-import com.janaldous.breadforyouph.service.ResourceNotFoundException;
+import com.janaldous.breadforyouph.testutil.TestUtils;
+import com.janaldous.breadforyouph.webfacade.ExceptionTranslator;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
-import com.janaldous.breadforyouph.webfacade.dto.OrderUpdateDto;
 import com.janaldous.breadforyouph.webfacade.dto.UserDto;
 
 @AutoConfigureMockMvc
-@ContextConfiguration(classes = { OrderController.class, ExceptionTranslator.class })
+@ContextConfiguration(classes = { PublicController.class, ExceptionTranslator.class })
 @WebMvcTest
-public class OrderControllerIT {
-
-	@SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory.getLogger(OrderControllerIT.class);
-
-	@MockBean
-	private OrderService orderService;
+public class PublicControllerIT {
 
 	@Autowired
 	private MockMvc mockMvc;
-
+	
+	@MockBean
+	private DeliveryDateService deliveryDateService;
+	
+	@MockBean
+	private OrderService orderService;
+	
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Test
+	public void testDeliveryDateWithResult() throws Exception {
+		List<DeliveryDate> availableDates = new ArrayList<>();
+		for (int i = 0; i < 5; i++) {
+			DeliveryDate date = new DeliveryDate();
+			date.setDate(new Date(TestUtils.getTimeAsMilis(i)));
+			date.setOrderLimit(6);
+			availableDates.add(date);
+		}
+		Page<DeliveryDate> page = new PageImpl<>(availableDates);
+		Mockito.when(deliveryDateService.getDeliveryDates(0, 5)).thenReturn(page);
 
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/delivery?page=0&size=5").accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(5)))
+				.andReturn();
+	}
+	
+	@Test
+	public void testDeliveryDateWihNoResult() throws Exception {
+		List<DeliveryDate> availableDates = new ArrayList<>();
+		Page<DeliveryDate> page = new PageImpl<>(availableDates);
+		Mockito.when(deliveryDateService.getDeliveryDates(0, 5)).thenReturn(page);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/delivery?page=0&size=5").accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(0)))
+				.andReturn();
+	}
+	
+	@Test
+	public void testDeliveryDateWith404() throws Exception {
+		List<DeliveryDate> availableDates = new ArrayList<>();
+		Page<DeliveryDate> page = new PageImpl<>(availableDates);
+		Mockito.when(deliveryDateService.getDeliveryDates(1, 5)).thenReturn(page);
+		
+		assertEquals(1, page.getTotalPages());
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/delivery?page=1&size=5").accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isNotFound())
+				.andReturn();
+	}
+	
 	@Test
 	public void testOrderInvalidUser() throws Exception {
 
 		OrderDto orderMock = getMockOrder();
 		orderMock.setUser(null);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.validation.user", containsString("must not be null")))
@@ -65,7 +113,7 @@ public class OrderControllerIT {
 		OrderDto orderMock = getMockOrder();
 		orderMock.getUser().setContactNumber(null);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andExpect(MockMvcResultMatchers
 						.jsonPath("$.validation['user.contactNumber']", containsString("Invalid mobile number")))
@@ -79,7 +127,7 @@ public class OrderControllerIT {
 		OrderDto orderMock = getMockOrder();
 		orderMock.getUser().setContactNumber("011212121");
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andExpect(MockMvcResultMatchers
 						.jsonPath("$.validation['user.contactNumber']", containsString("Invalid mobile number")))
@@ -93,7 +141,7 @@ public class OrderControllerIT {
 		OrderDto orderMock = getMockOrder();
 		orderMock.setAddress(null);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.validation.address", containsString("must not be null")))
@@ -106,7 +154,7 @@ public class OrderControllerIT {
 		OrderDto orderMock = getMockOrder();
 		orderMock.setDeliveryDateId(null);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andExpect(MockMvcResultMatchers
 						.jsonPath("$.validation['deliveryDateId']", containsString("must not be null")))
@@ -120,7 +168,7 @@ public class OrderControllerIT {
 		OrderDto orderMock = getMockOrder();
 		orderMock.getAddress().setLine1(null);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andExpect(MockMvcResultMatchers
 						.jsonPath("$.validation['orderDto']", containsString("Address fields should not be null when Delivery is chosen")))
@@ -134,55 +182,11 @@ public class OrderControllerIT {
 		OrderDto orderMock = getMockOrder();
 		orderMock.setDeliveryDateId(1l);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/order").content(mapper.writeValueAsString(orderMock))
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
 	}
-
-	@Test
-	public void testGetAllOrders() throws Exception {
-
-		mockMvc.perform(MockMvcRequestBuilders.get("/order").accept(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-	}
-
-	@Test
-	public void testUpdateNonExistingOrder() throws Exception {
-
-		Mockito.when(orderService.updateOrder(Mockito.anyLong(), Mockito.any(OrderUpdateDto.class)))
-				.thenThrow(ResourceNotFoundException.class);
-
-		OrderUpdateDto orderUpdate = new OrderUpdateDto();
-		orderUpdate.setStatus(OrderStatus.COOKING);
-
-		mockMvc.perform(MockMvcRequestBuilders.put("/order/1234").content(mapper.writeValueAsString(orderUpdate))
-				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
-	}
-
-	@Test
-	public void testUpdateInvalidOrderThenThrowBadRequest() throws Exception {
-
-		OrderUpdateDto orderUpdate = new OrderUpdateDto();
-		orderUpdate.setStatus(null);
-
-		mockMvc.perform(MockMvcRequestBuilders.put("/order/1234").content(mapper.writeValueAsString(orderUpdate))
-				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.validation.status", containsString("must not be null")))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
-	}
-
-	@Test
-	public void testGetOrder() throws Exception {
-		OrderDetail mockOrderDetail = new OrderDetail();
-		mockOrderDetail.setId(1234l);
-		Mockito.when(orderService.getOrder(Mockito.anyLong())).thenReturn(mockOrderDetail);
-
-		mockMvc.perform(MockMvcRequestBuilders.get("/order/1234").accept(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1234)))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-	}
-
+	
 	private OrderDto getMockOrder() {
 		OrderDto orderMock = new OrderDto();
 		AddressDto address = new AddressDto();
