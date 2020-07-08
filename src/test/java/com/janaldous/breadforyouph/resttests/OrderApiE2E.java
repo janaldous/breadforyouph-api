@@ -59,22 +59,29 @@ public class OrderApiE2E {
 			isDBInitialized = true;
 		}
 	}
+	
+	@Test
+	public void testGetOrdersWithoutAuthentication() {
+		get("/admin/order")
+		.then().assertThat().statusCode(HttpStatus.UNAUTHORIZED.value());
+	}
 
 	@Test
 	public void testGetOrders() {
-		get("/order").then().statusCode(HttpStatus.OK.value());
+		given().auth().preemptive().basic("admin", "admin")
+		.when().get("/admin/order")
+		.then().assertThat().statusCode(HttpStatus.OK.value());
 	}
 
 	@Test
 	public void testCreateAnOrderThenGetOrderDetail() {
 		// get delivery date
-		JsonPath deliveryListResult = get("/delivery?page=0&size=3").then().statusCode(HttpStatus.OK.value()).extract()
+		JsonPath deliveryListResult = get("/api/delivery?page=0&size=3").then().statusCode(HttpStatus.OK.value()).extract()
 				.jsonPath();
 
 		// should match regex pattern, since Safari cannot recognize
 		// yyyy-mm-ddTHH:mm:ss.SSSZ
 		String deliveryDateStr = deliveryListResult.getString("[0].date");
-		System.out.println(deliveryDateStr);
 		assertTrue(
 				Pattern.compile("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}$").matcher(deliveryDateStr).find());
 
@@ -85,11 +92,13 @@ public class OrderApiE2E {
 		orderDto.setDeliveryDateId(deliveryDate.getId());
 
 		OrderConfirmation result = given().contentType(MediaType.APPLICATION_JSON_VALUE.toString()).body(orderDto)
-				.when().post("/order").then().statusCode(HttpStatus.CREATED.value())
+				.when().post("/api/order").then().statusCode(HttpStatus.CREATED.value())
 				.body("orderStatus", is(OrderStatus.REGISTERED.toString())).extract().as(OrderConfirmation.class);
 
 		// should be able to get order detail
-		get("/order/" + result.getOrderNumber()).then().statusCode(HttpStatus.OK.value());
+		given().auth().basic("admin", "admin")
+		.when().get("/admin/order/" + result.getOrderNumber())
+		.then().assertThat().statusCode(HttpStatus.OK.value());
 	}
 
 }

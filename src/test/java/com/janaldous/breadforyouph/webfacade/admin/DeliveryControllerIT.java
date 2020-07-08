@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.janaldous.breadforyouph.config.BasicSecurityConfiguration;
 import com.janaldous.breadforyouph.data.DeliveryDate;
@@ -52,6 +53,16 @@ class DeliveryControllerIT {
 				.andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.orderLimit", is(6))).andReturn();
+	}
+	
+	@Test
+	public void testCreateDeliveryDateWithoutLogin() throws JsonProcessingException, Exception {
+		DeliveryDateDto deliveryDateDto = new DeliveryDateDto();
+		
+		mockMvc.perform(
+				MockMvcRequestBuilders.post("/admin/delivery").content(mapper.writeValueAsString(deliveryDateDto))
+						.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isUnauthorized());
 	}
 
 }
