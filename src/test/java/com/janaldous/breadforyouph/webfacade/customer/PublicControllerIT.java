@@ -11,18 +11,18 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.janaldous.breadforyouph.config.BasicSecurityConfiguration;
 import com.janaldous.breadforyouph.data.DeliveryDate;
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.PaymentType;
@@ -34,23 +34,22 @@ import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 import com.janaldous.breadforyouph.webfacade.dto.UserDto;
 
-@AutoConfigureMockMvc
-@ContextConfiguration(classes = { PublicController.class, ExceptionTranslator.class })
-@WebMvcTest
+@WebMvcTest(PublicController.class)
+@Import({ ExceptionTranslator.class, BasicSecurityConfiguration.class })
 public class PublicControllerIT {
 
 	@Autowired
 	private MockMvc mockMvc;
-	
+
 	@MockBean
 	private DeliveryDateService deliveryDateService;
-	
+
 	@MockBean
 	private OrderService orderService;
-	
+
 	@Autowired
 	private ObjectMapper mapper;
-	
+
 	@Test
 	public void testDeliveryDateWithResult() throws Exception {
 		List<DeliveryDate> availableDates = new ArrayList<>();
@@ -65,10 +64,9 @@ public class PublicControllerIT {
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/delivery?page=0&size=5").accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(5)))
-				.andReturn();
+				.andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(5))).andReturn();
 	}
-	
+
 	@Test
 	public void testDeliveryDateWihNoResult() throws Exception {
 		List<DeliveryDate> availableDates = new ArrayList<>();
@@ -77,23 +75,21 @@ public class PublicControllerIT {
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/delivery?page=0&size=5").accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(0)))
-				.andReturn();
+				.andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(0))).andReturn();
 	}
-	
+
 	@Test
 	public void testDeliveryDateWith404() throws Exception {
 		List<DeliveryDate> availableDates = new ArrayList<>();
 		Page<DeliveryDate> page = new PageImpl<>(availableDates);
 		Mockito.when(deliveryDateService.getDeliveryDates(1, 5)).thenReturn(page);
-		
+
 		assertEquals(1, page.getTotalPages());
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/delivery?page=1&size=5").accept(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isNotFound())
-				.andReturn();
+				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 	}
-	
+
 	@Test
 	public void testOrderInvalidUser() throws Exception {
 
@@ -106,7 +102,7 @@ public class PublicControllerIT {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.validation.user", containsString("must not be null")))
 				.andReturn();
 	}
-	
+
 	@Test
 	public void testOrderNullUserContactNumber() throws Exception {
 
@@ -120,7 +116,7 @@ public class PublicControllerIT {
 				.andReturn();
 
 	}
-	
+
 	@Test
 	public void testOrderInvalidUserContactNumber() throws Exception {
 
@@ -147,7 +143,7 @@ public class PublicControllerIT {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.validation.address", containsString("must not be null")))
 				.andReturn();
 	}
-	
+
 	@Test
 	public void testOrderInvalidOrderDate() throws Exception {
 
@@ -170,8 +166,9 @@ public class PublicControllerIT {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/order").content(mapper.writeValueAsString(orderMock))
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andExpect(MockMvcResultMatchers
-						.jsonPath("$.validation['orderDto']", containsString("Address fields should not be null when Delivery is chosen")))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.validation['orderDto']",
+						containsString("Address fields should not be null when Delivery is chosen")))
 				.andReturn();
 
 	}
@@ -186,7 +183,7 @@ public class PublicControllerIT {
 				.contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
 	}
-	
+
 	private OrderDto getMockOrder() {
 		OrderDto orderMock = new OrderDto();
 		AddressDto address = new AddressDto();

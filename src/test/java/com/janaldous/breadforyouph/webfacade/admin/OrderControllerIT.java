@@ -8,26 +8,26 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.janaldous.breadforyouph.config.BasicSecurityConfiguration;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderStatus;
 import com.janaldous.breadforyouph.service.OrderService;
 import com.janaldous.breadforyouph.service.ResourceNotFoundException;
+import com.janaldous.breadforyouph.testutil.WithAdminUser;
 import com.janaldous.breadforyouph.webfacade.ExceptionTranslator;
 import com.janaldous.breadforyouph.webfacade.dto.OrderUpdateDto;
 
-@AutoConfigureMockMvc
-@ContextConfiguration(classes = { OrderController.class, ExceptionTranslator.class })
-@WebMvcTest
+@WebMvcTest(OrderController.class)
+@Import({ ExceptionTranslator.class, BasicSecurityConfiguration.class })
 public class OrderControllerIT {
 
 	@SuppressWarnings("unused")
@@ -43,6 +43,7 @@ public class OrderControllerIT {
 	private ObjectMapper mapper;
 
 	@Test
+	@WithAdminUser
 	public void testGetAllOrders() throws Exception {
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/admin/order").accept(MediaType.APPLICATION_JSON))
@@ -50,6 +51,7 @@ public class OrderControllerIT {
 	}
 
 	@Test
+	@WithAdminUser
 	public void testUpdateNonExistingOrder() throws Exception {
 
 		Mockito.when(orderService.updateOrder(Mockito.anyLong(), Mockito.any(OrderUpdateDto.class)))
@@ -64,6 +66,7 @@ public class OrderControllerIT {
 	}
 
 	@Test
+	@WithAdminUser
 	public void testUpdateInvalidOrderThenThrowBadRequest() throws Exception {
 
 		OrderUpdateDto orderUpdate = new OrderUpdateDto();
@@ -76,14 +79,15 @@ public class OrderControllerIT {
 	}
 
 	@Test
+	@WithAdminUser
 	public void testGetOrder() throws Exception {
 		OrderDetail mockOrderDetail = new OrderDetail();
 		mockOrderDetail.setId(1234l);
 		Mockito.when(orderService.getOrder(Mockito.anyLong())).thenReturn(mockOrderDetail);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/admin/order/1234").accept(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1234)))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1234))).andReturn();
 	}
 
 }
