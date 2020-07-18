@@ -49,7 +49,7 @@ class DeliveryDateRepositoryIT {
 		assertEquals(3, deliveryDateRepository.count());
 
 		OrderDto orderDto = OrderDtoMockFactory.factory();
-		orderDto.setDeliveryDateId(deliveryDateRepository.findByDate(TestUtils.convertLocalDateToDate(LocalDate.now())).getId());
+		orderDto.setDeliveryDateId(deliveryDateRepository.findByDate(TestUtils.convertLocalDateToDate(LocalDate.now())).map(x -> x.getId()).orElse(null));
 		
 		orderService.order(orderDto);
 		orderService.order(orderDto);

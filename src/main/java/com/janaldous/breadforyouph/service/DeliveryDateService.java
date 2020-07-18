@@ -25,6 +25,10 @@ public class DeliveryDateService {
 	}
 
 	public DeliveryDate createDeliveryDate(DeliveryDateDto deliveryDate) {
+		if (deliveryDateRepository.findByDate(deliveryDate.getDate()).isPresent()) {
+			throw new ResourceAlreadyExistsException();
+		}
+		
 		DeliveryDate input = DeliveryDateMapper.toEntity(deliveryDate);
 		return deliveryDateRepository.save(input);
 	}

@@ -36,19 +36,19 @@ class DeliveryDateServiceIT {
 
 	@Autowired
 	private DeliveryDateService deliveryDateService;
-	
+
 	@Autowired
 	private OrderService orderService;
-	
+
 	@Autowired
 	private OrderRepository orderRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private AddressRepository addressRepository;
-	
+
 	@Autowired
 	private OrderItemRepository orderItemRepository;
 
@@ -80,7 +80,7 @@ class DeliveryDateServiceIT {
 		assertEquals(1, result.getTotalElements());
 		assertEquals(1, result.getContent().size());
 	}
-	
+
 	@Test
 	void testOnePage() {
 		for (int i = 0; i < 5; i++) {
@@ -126,19 +126,19 @@ class DeliveryDateServiceIT {
 	void testGetNullDeliveryDateThenThrowParameterValidationException() {
 		assertThrows(InvalidDataAccessApiUsageException.class, () -> deliveryDateService.getDeliveryDate(null));
 	}
-	
+
 	@Test
 	void testValidateDeliveryDateGivenDateWhenEnoughSpaceThenValidRequest() {
 		DeliveryDate deliveryDate = new DeliveryDate();
 		deliveryDate.setDate(TestUtils.convertLocalDateToDate(LocalDate.now()));
 		deliveryDate = deliveryDateRepository.save(deliveryDate);
-		
+
 		assertTrue(deliveryDateService.isDeliveryDateAvailable(deliveryDate.getId()));
-		
+
 		// clean up
 		deliveryDateRepository.deleteById(deliveryDate.getId());
 	}
-	
+
 	@Test
 	void testValidateDeliveryDateGivenDateWhenNotEnoughSpaceThenInvalidRequest() {
 		// set up
@@ -146,17 +146,31 @@ class DeliveryDateServiceIT {
 		deliveryDate.setDate(TestUtils.convertLocalDateToDate(LocalDate.now()));
 		deliveryDate.setOrderLimit(1);
 		deliveryDate = deliveryDateRepository.save(deliveryDate);
-		
+
 		OrderDto orderDtoMock = OrderDtoMockFactory.factory();
 		orderDtoMock.setDeliveryDateId(deliveryDate.getId());
 		orderService.order(orderDtoMock);
-		
+
 		// action
 		assertFalse(deliveryDateService.isDeliveryDateAvailable(deliveryDate.getId()));
-		
+
 		// clean up
 		orderRepository.deleteAll();
 		deliveryDateRepository.deleteById(deliveryDate.getId());
+	}
+
+	@Test
+	void testSaveDeliveryDateWhenAlreadyExistsThenError() {
+		// set up
+		DeliveryDate deliveryDate = new DeliveryDate();
+		deliveryDate.setDate(TestUtils.convertLocalDateToDate(LocalDate.now().plusDays(1)));
+		deliveryDate.setOrderLimit(1);
+		deliveryDate = deliveryDateRepository.save(deliveryDate);
+
+		DeliveryDateDto input = new DeliveryDateDto();
+		input.setDate(TestUtils.convertLocalDateToDate(LocalDate.now().plusDays(1)));
+
+		assertThrows(ResourceAlreadyExistsException.class, () -> deliveryDateService.createDeliveryDate(input));
 	}
 
 }
