@@ -43,7 +43,7 @@ public class BasicSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	private CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://localhost:3000", "https://breadforyouph-dev.herokuapp.com"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://localhost:3000", "https://breadforyouph-dev.herokuapp.com", "https://www.breadforyouph.life"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
