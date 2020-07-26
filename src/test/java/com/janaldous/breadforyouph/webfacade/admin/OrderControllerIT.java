@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.janaldous.breadforyouph.config.BasicSecurityConfiguration;
+import com.janaldous.breadforyouph.config.SecurityConfig;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.OrderStatus;
 import com.janaldous.breadforyouph.service.OrderService;
@@ -27,7 +27,7 @@ import com.janaldous.breadforyouph.webfacade.ExceptionTranslator;
 import com.janaldous.breadforyouph.webfacade.dto.OrderUpdateDto;
 
 @WebMvcTest(OrderController.class)
-@Import({ ExceptionTranslator.class, BasicSecurityConfiguration.class })
+@Import({ ExceptionTranslator.class, SecurityConfig.class })
 public class OrderControllerIT {
 
 	@SuppressWarnings("unused")

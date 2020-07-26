@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.janaldous.breadforyouph.config.BasicSecurityConfiguration;
 import com.janaldous.breadforyouph.data.DeliveryDate;
 import com.janaldous.breadforyouph.service.DeliveryDateService;
 import com.janaldous.breadforyouph.testutil.WithAdminUser;
@@ -25,7 +24,7 @@ import com.janaldous.breadforyouph.webfacade.ExceptionTranslator;
 import com.janaldous.breadforyouph.webfacade.dto.DeliveryDateDto;
 
 @WebMvcTest(DeliveryController.class)
-@Import({ ExceptionTranslator.class, BasicSecurityConfiguration.class })
+@Import({ ExceptionTranslator.class })
 class DeliveryControllerIT {
 
 	@Autowired

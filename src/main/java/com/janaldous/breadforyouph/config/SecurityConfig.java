@@ -32,8 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
+		.mvcMatchers("/api").permitAll()
 		.mvcMatchers("/admin").authenticated()
-        .mvcMatchers("/api").permitAll()
         .anyRequest().permitAll()
         .and()
         .cors().configurationSource(corsConfigurationSource())
@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "https://breadforyouph-dev.herokuapp.com"));
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "https://breadforyouph-dev.herokuapp.com", "https://www.breadforyouph.life"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

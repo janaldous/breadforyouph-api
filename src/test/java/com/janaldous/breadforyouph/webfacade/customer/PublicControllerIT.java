@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.janaldous.breadforyouph.config.BasicSecurityConfiguration;
 import com.janaldous.breadforyouph.data.DeliveryDate;
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.PaymentType;
@@ -35,7 +34,7 @@ import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 import com.janaldous.breadforyouph.webfacade.dto.UserDto;
 
 @WebMvcTest(PublicController.class)
-@Import({ ExceptionTranslator.class, BasicSecurityConfiguration.class })
+@Import({ ExceptionTranslator.class })
 public class PublicControllerIT {
 
 	@Autowired

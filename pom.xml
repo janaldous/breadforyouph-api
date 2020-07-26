@@ -132,7 +132,6 @@
 			<artifactId>rest-assured</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -151,9 +150,6 @@
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-maven-plugin</artifactId>
 				<version>3.7.0</version>
-				<!-- <dependencies> <dependency> <groupId>com.whiteclarkegroup</groupId> 
-					<artifactId>liquibase-linter</artifactId> <version>0.5.1</version> </dependency> 
-					</dependencies> -->
 				<dependencies>
 					<dependency>
 						<groupId>org.liquibase.ext</groupId>
