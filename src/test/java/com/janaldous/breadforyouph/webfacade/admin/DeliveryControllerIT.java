@@ -4,6 +4,9 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.Date;
 
+import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +22,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.janaldous.breadforyouph.data.DeliveryDate;
 import com.janaldous.breadforyouph.service.DeliveryDateService;
-import com.janaldous.breadforyouph.testutil.WithAdminUser;
+import com.janaldous.breadforyouph.testutil.ApiTokenGetterUtil;
 import com.janaldous.breadforyouph.webfacade.ExceptionTranslator;
 import com.janaldous.breadforyouph.webfacade.dto.DeliveryDateDto;
 
+@Tag("IntegrationTest")
 @WebMvcTest(DeliveryController.class)
-@Import({ ExceptionTranslator.class })
+@Import({ ExceptionTranslator.class, ApiTokenGetterUtil.class })
 class DeliveryControllerIT {
 
 	@Autowired
@@ -35,9 +39,20 @@ class DeliveryControllerIT {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private ApiTokenGetterUtil apiTokenGetterUtil;
+	
+	private String token;
+	
+	@BeforeEach
+	public void beforeEach() throws JSONException {
+		if (token == null) {
+			token = apiTokenGetterUtil.getManagementApiToken();
+		}
+	}
 
 	@Test
-	@WithAdminUser
 	public void testCreateDeliveryDate() throws Exception {
 		DeliveryDateDto deliveryDateDto = new DeliveryDateDto();
 		DeliveryDate mockDeliveryDateResult = new DeliveryDate();
@@ -48,20 +63,20 @@ class DeliveryControllerIT {
 
 		mockMvc.perform(
 				MockMvcRequestBuilders.post("/admin/delivery").content(mapper.writeValueAsString(deliveryDateDto))
-						.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+						.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.id", is(1)))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.orderLimit", is(6))).andReturn();
 	}
-	
+
 	@Test
 	public void testCreateDeliveryDateWithoutLogin() throws JsonProcessingException, Exception {
 		DeliveryDateDto deliveryDateDto = new DeliveryDateDto();
-		
+
 		mockMvc.perform(
 				MockMvcRequestBuilders.post("/admin/delivery").content(mapper.writeValueAsString(deliveryDateDto))
 						.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isUnauthorized());
+				.andExpect(MockMvcResultMatchers.status().isForbidden());
 	}
 
 }
