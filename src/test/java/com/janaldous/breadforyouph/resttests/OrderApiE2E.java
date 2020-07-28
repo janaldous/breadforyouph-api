@@ -28,7 +28,7 @@ import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 
-@Tag("IntegrationTest")
+@Tag("E2E")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class OrderApiE2E {
 

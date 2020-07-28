@@ -2,11 +2,13 @@ package com.janaldous.breadforyouph.domain.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.janaldous.breadforyouph.data.Address;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 
+@Tag("UnitTest")
 class AddressMapperTest {
 
 	@Test
