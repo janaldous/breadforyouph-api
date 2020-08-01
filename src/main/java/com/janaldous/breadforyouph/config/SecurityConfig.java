@@ -37,22 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/api/**").permitAll()
 		.antMatchers("/admin/**").authenticated()
         .and()
-        .cors().configurationSource(corsConfigurationSource())
-        .and()
         .oauth2ResourceServer().jwt();
 	}
 
-	private CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "https://breadforyouph-dev.herokuapp.com", "https://www.breadforyouph.life"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/admin/**", configuration);
-        return source;
-	}
-	
 	@Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/api/**");
