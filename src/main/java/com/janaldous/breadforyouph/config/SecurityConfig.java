@@ -1,7 +1,5 @@
 package com.janaldous.breadforyouph.config;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,9 +13,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.janaldous.breadforyouph.config.security.AudienceValidator;
 
@@ -37,22 +32,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/api/**").permitAll()
 		.antMatchers("/admin/**").authenticated()
         .and()
-        .cors().configurationSource(corsConfigurationSource())
-        .and()
         .oauth2ResourceServer().jwt();
 	}
 
-	private CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "https://breadforyouph-dev.herokuapp.com", "https://www.breadforyouph.life"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/admin/**", configuration);
-        return source;
-	}
-	
 	@Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/api/**");
