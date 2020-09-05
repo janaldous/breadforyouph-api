@@ -28,6 +28,7 @@ import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.PaymentType;
 import com.janaldous.breadforyouph.service.DeliveryDateService;
 import com.janaldous.breadforyouph.service.OrderService;
+import com.janaldous.breadforyouph.testutil.ProductDtoMockFactory;
 import com.janaldous.breadforyouph.testutil.TestUtils;
 import com.janaldous.breadforyouph.webfacade.ExceptionTranslator;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
@@ -202,7 +203,7 @@ public class PublicControllerIT {
 		user.setContactNumber("09123456789");
 		orderMock.setUser(user);
 		orderMock.setPaymentType(PaymentType.CASH);
-		orderMock.setQuantity(1l);
+		orderMock.setProducts(ProductDtoMockFactory.getMockProducts());
 		return orderMock;
 	}
 }

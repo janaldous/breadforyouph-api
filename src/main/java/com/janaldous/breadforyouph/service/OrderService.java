@@ -1,10 +1,10 @@
 package com.janaldous.breadforyouph.service;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -37,9 +37,6 @@ public class OrderService {
 	private OrderRepository orderRepository;
 
 	@Autowired
-	private ProductRepository productRepository;
-
-	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
@@ -47,25 +44,35 @@ public class OrderService {
 
 	@Autowired
 	private OrderTrackingRepository orderTrackingRepository;
-	
+
 	@Autowired
 	private DeliveryDateService deliveryDateService;
+
+	@Autowired
+	private ProductRepository productRepository;
+
+	@Autowired
+	private OrderItemMapper orderItemMapper;
 
 	public OrderConfirmation order(OrderDto orderDto) {
 		OrderDetail orderDetail = OrderMapper.toEntity(orderDto);
 		orderDetail.setOrderDate(new Date());
-		
-		if (!deliveryDateService.isDeliveryDateAvailable(orderDto.getDeliveryDateId())) throw new OrderException("Order limit exeeded");
+
+		if (!deliveryDateService.isDeliveryDateAvailable(orderDto.getDeliveryDateId()))
+			throw new OrderException("Order limit exeeded");
 
 		// set delivery date
 		DeliveryDate deliveryDate = deliveryDateService.getDeliveryDate(orderDto.getDeliveryDateId());
 		orderDetail.setDeliveryDate(deliveryDate);
 
-		// set product
-		Product originalBananaBread = productRepository.findByName("Original Banana Bread");
-		OrderItem orderItem = OrderItemMapper.toEntity(orderDto.getQuantity(), originalBananaBread, orderDetail);
-		orderDetail.setOrderItems(Arrays.asList(orderItem));
-		
+		// set products
+		List<OrderItem> orderItems = orderDto.getProducts().stream().map(productDto -> {
+			Product product = productRepository.findById(productDto.getId()).orElseThrow(
+					() -> new ResourceNotFoundException("Product not found with id: " + productDto.getId()));
+			return orderItemMapper.toEntity(product, productDto.getQuantity(), orderDetail);
+		}).collect(Collectors.toList());
+		orderDetail.setOrderItems(orderItems);
+
 		// set sum
 		BigDecimal total = orderDetail.getOrderItems().stream().map(x -> x.getBuyingPrice()).reduce(BigDecimal.ZERO,
 				(subtotal, element) -> subtotal.add(element));
@@ -74,7 +81,7 @@ public class OrderService {
 		// save transitive entities
 		addressRepository.save(orderDetail.getShipping());
 		userRepository.save(orderDetail.getUser());
-		
+
 		// set tracking
 		OrderTracking tracking = new OrderTracking();
 		tracking.setStatus(OrderStatus.REGISTERED);
@@ -82,7 +89,7 @@ public class OrderService {
 		orderDetail.setTracking(tracking);
 
 		OrderDetail savedOrder = orderRepository.save(orderDetail);
-		
+
 		return OrderConfirmationMapper.toDto(savedOrder);
 	}
 
@@ -95,20 +102,23 @@ public class OrderService {
 
 	public OrderDetail updateOrder(Long id, @Valid OrderUpdateDto orderDto) {
 		Optional<OrderDetail> optOrder = orderRepository.findById(id);
-		if (!optOrder.isPresent()) throw new ResourceNotFoundException("Order with id: " + id + " was not found");
-		
+		if (!optOrder.isPresent())
+			throw new ResourceNotFoundException("Order with id: " + id + " was not found");
+
 		OrderDetail orderDetail = optOrder.get();
 		orderDetail.getTracking().setStatus(orderDto.getStatus());
-		
+
 		return orderRepository.save(orderDetail);
 	}
 
 	public OrderDetail getOrder(Long id) {
-		if (id == null) throw new IllegalArgumentException();
-		
+		if (id == null)
+			throw new IllegalArgumentException();
+
 		Optional<OrderDetail> optOrder = orderRepository.findById(id);
-		if (!optOrder.isPresent()) throw new ResourceNotFoundException("Order with id: " + id + " was not found");
-		
+		if (!optOrder.isPresent())
+			throw new ResourceNotFoundException("Order with id: " + id + " was not found");
+
 		return optOrder.get();
 	}
 

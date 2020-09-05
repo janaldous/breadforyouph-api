@@ -19,7 +19,7 @@ import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvide
 @Provider("breadforyouph-service")
 @PactFolder("src/test/resources/pacts")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PactVerificationTest {
+public class PactVerificationCDCIT {
 
 	@LocalServerPort
 	private int port;

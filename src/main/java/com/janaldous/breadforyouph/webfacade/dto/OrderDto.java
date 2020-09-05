@@ -1,5 +1,7 @@
 package com.janaldous.breadforyouph.webfacade.dto;
 
+import java.util.List;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -17,7 +19,7 @@ public class OrderDto {
 	private UserDto user;
 	
 	@NotNull
-	private Long quantity;
+	private List<ProductDto> products;
 	
 	@NotNull
 	private PaymentType paymentType;

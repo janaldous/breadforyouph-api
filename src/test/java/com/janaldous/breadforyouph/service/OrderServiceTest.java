@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.data.domain.Sort;
 
 import com.janaldous.breadforyouph.data.AddressRepository;
@@ -34,6 +35,8 @@ import com.janaldous.breadforyouph.data.Product;
 import com.janaldous.breadforyouph.data.ProductRepository;
 import com.janaldous.breadforyouph.data.User;
 import com.janaldous.breadforyouph.data.UserRepository;
+import com.janaldous.breadforyouph.domain.mapper.OrderItemMapper;
+import com.janaldous.breadforyouph.testutil.ProductDtoMockFactory;
 import com.janaldous.breadforyouph.testutil.TestUtils;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
@@ -60,6 +63,9 @@ class OrderServiceTest {
 	
 	@Mock
 	private DeliveryDateService deliveryDateService;
+	
+	@Spy
+	private OrderItemMapper orderItemMapper = new OrderItemMapper();
 
 	@InjectMocks
 	private OrderService orderService;
@@ -79,7 +85,7 @@ class OrderServiceTest {
 		orderDto.setAddress(address);
 		orderDto.setDeliveryType(DeliveryType.DELIVER);
 		orderDto.setPaymentType(PaymentType.CASH);
-		orderDto.setQuantity(1l);
+		orderDto.setProducts(ProductDtoMockFactory.getMockProducts());
 		orderDto.setDeliveryDateId(1l);
 		UserDto user = new UserDto();
 		user.setContactNumber("1234567890");
@@ -87,7 +93,7 @@ class OrderServiceTest {
 
 		Product mockBananaBread = Mockito.mock(Product.class);
 		Mockito.when(mockBananaBread.getUnitPrice()).thenReturn(BigDecimal.valueOf(165));
-		Mockito.when(productRepository.findByName("Original Banana Bread")).thenReturn(mockBananaBread);
+		Mockito.when(productRepository.findById(991l)).thenReturn(Optional.of(mockBananaBread));
 
 		DeliveryDate mockDeliveryDate = new DeliveryDate();
 		mockDeliveryDate.setDate(TestUtils.convertLocalDateToDate(LocalDate.now()));

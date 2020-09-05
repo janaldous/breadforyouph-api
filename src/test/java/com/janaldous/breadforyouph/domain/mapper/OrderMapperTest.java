@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.OrderDetail;
 import com.janaldous.breadforyouph.data.PaymentType;
+import com.janaldous.breadforyouph.testutil.ProductDtoMockFactory;
 import com.janaldous.breadforyouph.webfacade.dto.AddressDto;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
 import com.janaldous.breadforyouph.webfacade.dto.UserDto;
@@ -27,7 +28,7 @@ class OrderMapperTest {
 		orderDto.setAddress(address);
 		orderDto.setDeliveryType(DeliveryType.DELIVER);
 		orderDto.setPaymentType(PaymentType.CASH);
-		orderDto.setQuantity(1l);
+		orderDto.setProducts(ProductDtoMockFactory.getMockProducts());
 		orderDto.setDeliveryDateId(0l);
 
 		OrderDetail result = OrderMapper.toEntity(orderDto);

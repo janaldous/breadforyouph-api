@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.janaldous.breadforyouph.data.DeliveryType;
 import com.janaldous.breadforyouph.data.PaymentType;
+import com.janaldous.breadforyouph.testutil.ProductDtoMockFactory;
 import com.janaldous.breadforyouph.testutil.ValidationTestUtils;
 
 class ValidAddressValidatorTest {
@@ -85,7 +86,7 @@ class ValidAddressValidatorTest {
 		user.setContactNumber("09123456789");
 		orderMock.setUser(user);
 		orderMock.setPaymentType(PaymentType.CASH);
-		orderMock.setQuantity(1l);
+		orderMock.setProducts(ProductDtoMockFactory.getMockProducts());
 		return orderMock;
 	}
 
