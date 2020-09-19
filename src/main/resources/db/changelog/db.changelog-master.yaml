@@ -385,3 +385,26 @@ databaseChangeLog:
         referencedColumnNames: id
         referencedTableName: delivery_date
         validate: true
+- changeSet:
+    id: 5
+    author: janaldous
+    changes:
+    - insert:
+       tableName: product
+       columns:
+       - column:
+           name: id
+           value: 2
+       - column:
+           name: code
+           value: CBB
+       - column:
+           name: description
+           value: Banana bread with chocolate chips
+       - column:
+           name: name
+           value: Chocolate Chip Banana Bread
+       - column:
+           name: unit_price
+           value: 185
+    

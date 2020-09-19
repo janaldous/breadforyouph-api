@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.janaldous.breadforyouph.data.DeliveryDate;
+import com.janaldous.breadforyouph.data.Product;
 import com.janaldous.breadforyouph.service.DeliveryDateService;
 import com.janaldous.breadforyouph.service.OrderService;
+import com.janaldous.breadforyouph.service.ProductService;
 import com.janaldous.breadforyouph.service.ResourceNotFoundException;
 import com.janaldous.breadforyouph.webfacade.dto.OrderConfirmation;
 import com.janaldous.breadforyouph.webfacade.dto.OrderDto;
@@ -32,9 +34,12 @@ public class PublicController {
 
 	@Autowired
 	private DeliveryDateService deliveryService;
-	
+
 	@Autowired
 	private OrderService orderService;
+
+	@Autowired
+	private ProductService productService;
 
 	@GetMapping("/delivery")
 	public @ResponseBody List<DeliveryDate> getDeliveryDates(@RequestParam("page") int page,
@@ -45,12 +50,17 @@ public class PublicController {
 			throw new ResourceNotFoundException(
 					"Cannot find delivery dates with params: page=" + page + " size=" + size);
 		}
-		
+
 		return resultPage.getContent();
 	}
-	
+
 	@PostMapping("/order")
 	public @ResponseBody ResponseEntity<OrderConfirmation> order(@Valid @RequestBody OrderDto orderDto) {
 		return new ResponseEntity<OrderConfirmation>(orderService.order(orderDto), HttpStatus.CREATED);
+	}
+
+	@GetMapping("/products")
+	public @ResponseBody List<Product> getProducts(@RequestParam("page") int page, @RequestParam("size") int size) {
+		return productService.getProducts(page, size).getContent();
 	}
 }
